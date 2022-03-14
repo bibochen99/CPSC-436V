@@ -65,9 +65,11 @@ class ChoroplethMap {
 
     vis.symbolScale = d3.scaleSqrt().range([4, 25]);
 
-    // vis.colorScale = d3.scaleLinear()
-    //     .range(['#cfe2f2', '#0d306b'])
-    //     .interpolate(d3.interpolateHcl);
+    // vis.colorScale = d3.scaleOrdinal().range(["#d3eecd", "#7bc77e", "#2a8d46"]); // light green to dark green
+    vis.colorScale = d3
+      .scaleLinear()
+      .range(["#d3eecd", "#7bc77e", "#2a8d46"])
+      .interpolate(d3.interpolateHcl);
 
     // Initialize gradient that we will later use for the legend
     // vis.linearGradient = vis.svg.append('defs').append('linearGradient')
@@ -94,10 +96,12 @@ class ChoroplethMap {
   updateVis() {
     let vis = this;
 
-    // const popDensityExtent = d3.extent(vis.data.objects.collection.geometries, d => d.properties.pop_density);
+    vis.mapValue = d3.extent(vis.geoData.objects.world_countries.geometries, d => d.properties.lifeLadder);
 
-    // Update color scale
-    // vis.colorScale.domain(popDensityExtent);
+    // Update color domain
+    // vis.colorScale.domain(["few", "mid", "lar"]);
+
+    vis.colorScale.domain(vis.mapValue);
 
     // Define begin and end of the color gradient (legend)
     // vis.legendStops = [
@@ -126,7 +130,8 @@ class ChoroplethMap {
       )
       .join("path")
       .attr("class", "geo-path")
-      .attr("d", vis.geoPath);
+      .attr("d", vis.geoPath)
+      .attr("fill", (d) => vis.colorScale(d.properties.lifeLadder));
 
     // // Append country borders
     // const geoBoundaryPath = vis.chart
@@ -140,7 +145,7 @@ class ChoroplethMap {
     geoPath
       .on("mousemove", (event, d) => {
         let name = d.properties.name;
-        let ladder = d.properties.lifeLadder ?d.properties.lifeLadder:"N/A";
+        let ladder = d.properties.lifeLadder ? d.properties.lifeLadder : "N/A";
         d3
           .select("#map-tooltip")
           .style("display", "block")
