@@ -37,7 +37,8 @@ Promise.all([
     for (let i = 0; i < data.length; i++) {
       if (d.properties.name == data[i]["Country name"]) {
         if (data[i].year === 2013) {
-          d.properties.lifeLadder = +data[i]["Life Ladder"];
+          d.properties.year =2013;
+          d.properties.lifeLadder = data[i]["Life Ladder"];
         }
       }
     }
