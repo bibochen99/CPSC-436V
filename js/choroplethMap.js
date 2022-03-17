@@ -68,27 +68,37 @@ class ChoroplethMap {
     // vis.colorScale = d3.scaleOrdinal().range(["#d3eecd", "#7bc77e", "#2a8d46"]); // light green to dark green
     vis.colorScale = d3
       .scaleLinear()
-      .range(["#d3eecd", "#7bc77e", "#2a8d46"])
+      .range(["#cfe2f2", "#0d306b"])
       .interpolate(d3.interpolateHcl);
 
     // Initialize gradient that we will later use for the legend
-    // vis.linearGradient = vis.svg.append('defs').append('linearGradient')
-    //     .attr("id", "legend-gradient");
+    vis.linearGradient = vis.svg
+      .append("defs")
+      .append("linearGradient")
+      .attr("id", "legend-gradient");
 
     // Append legend
-    // vis.legend = vis.chart.append('g')
-    //     .attr('class', 'legend')
-    //     .attr('transform', `translate(${vis.config.legendLeft},${vis.height - vis.config.legendBottom})`);
+    vis.legend = vis.chart
+      .append("g")
+      .attr("class", "legend")
+      .attr(
+        "transform",
+        `translate(${vis.config.legendLeft},${
+          vis.height - vis.config.legendBottom
+        })`
+      );
 
-    // vis.legendRect = vis.legend.append('rect')
-    //     .attr('width', vis.config.legendRectWidth)
-    //     .attr('height', vis.config.legendRectHeight);
+    vis.legendRect = vis.legend
+      .append("rect")
+      .attr("width", vis.config.legendRectWidth)
+      .attr("height", vis.config.legendRectHeight);
 
-    // vis.legendTitle = vis.legend.append('text')
-    //     .attr('class', 'legend-title')
-    //     .attr('dy', '.35em')
-    //     .attr('y', -10)
-    //     .text('Pop. density per square km')
+    vis.legendTitle = vis.legend
+      .append("text")
+      .attr("class", "legend-title")
+      .attr("dy", ".35em")
+      .attr("y", -10)
+      .text("Life Ladder");
 
     vis.updateVis();
   }
@@ -96,18 +106,40 @@ class ChoroplethMap {
   updateVis() {
     let vis = this;
 
-    vis.mapValue = d3.extent(vis.geoData.objects.world_countries.geometries, d => d.properties.lifeLadder);
+    vis.mapValue = d3.extent(
+      vis.geoData.objects.world_countries.geometries,
+      (d) => d.properties.lifeLadder
+    );
 
+    console.log(vis.data);
+    let range = d3.extent(vis.data, (d) => d["Life Ladder"]);
+    let min = range[0],
+      max = range[1];
+    console.log(range);
+    vis.geoData.objects.world_countries.geometries.forEach((d) => {
+      if (d.properties.lifeLadder == max) {
+        d.properties.isMax = 1;
+        console.log("max");
+      } else if (d.properties.lifeLadder == min) {
+        d.properties.isMin = 1;
+        console.log("min");
+      } else {
+        d.properties.isMax = 0;
+        d.properties.isMin = 0;
+      }
+    });
+
+    console.log(vis.geoData);
     // Update color domain
     // vis.colorScale.domain(["few", "mid", "lar"]);
 
     vis.colorScale.domain(vis.mapValue);
 
     // Define begin and end of the color gradient (legend)
-    // vis.legendStops = [
-    //   { color: '#cfe2f2', value: popDensityExtent[0], offset: 0},
-    //   { color: '#0d306b', value: popDensityExtent[1], offset: 100},
-    // ];
+    vis.legendStops = [
+      { color: "#cfe2f2", value: 2, offset: 0 },
+      { color: "#0d306b", value: 10, offset: 100 },
+    ];
     vis.symbolScale.domain(d3.extent(vis.data, (d) => d["Life Ladder"]));
     vis.renderVis();
   }
@@ -131,7 +163,15 @@ class ChoroplethMap {
       .join("path")
       .attr("class", "geo-path")
       .attr("d", vis.geoPath)
-      .attr("fill", (d) => vis.colorScale(d.properties.lifeLadder));
+      .attr("fill", (d) => {
+        if (d.properties.isMax == 1) {
+          return "#F4CF49";
+        } else if(d.properties.isMin == 1){
+          return "#F8E6A5";
+        }else {
+          return vis.colorScale(d.properties.lifeLadder);
+        }
+      });
 
     // // Append country borders
     // const geoBoundaryPath = vis.chart
@@ -163,27 +203,27 @@ class ChoroplethMap {
       });
 
     // Add legend labels
-    // vis.legend
-    //   .selectAll(".legend-label")
-    //   .data(vis.legendStops)
-    //   .join("text")
-    //   .attr("class", "legend-label")
-    //   .attr("text-anchor", "middle")
-    //   .attr("dy", ".35em")
-    //   .attr("y", 20)
-    //   .attr("x", (d, index) => {
-    //     return index == 0 ? 0 : vis.config.legendRectWidth;
-    //   })
-    //   .text((d) => Math.round(d.value * 10) / 10);
+    vis.legend
+      .selectAll(".legend-label")
+      .data(vis.legendStops)
+      .join("text")
+      .attr("class", "legend-label")
+      .attr("text-anchor", "middle")
+      .attr("dy", ".35em")
+      .attr("y", 20)
+      .attr("x", (d, index) => {
+        return index == 0 ? 0 : vis.config.legendRectWidth;
+      })
+      .text((d) => Math.round(d.value * 10) / 10);
 
-    // // Update gradient for legend
-    // vis.linearGradient
-    //   .selectAll("stop")
-    //   .data(vis.legendStops)
-    //   .join("stop")
-    //   .attr("offset", (d) => d.offset)
-    //   .attr("stop-color", (d) => d.color);
+    // Update gradient for legend
+    vis.linearGradient
+      .selectAll("stop")
+      .data(vis.legendStops)
+      .join("stop")
+      .attr("offset", (d) => d.offset)
+      .attr("stop-color", (d) => d.color);
 
-    // vis.legendRect.attr("fill", "url(#legend-gradient)");
+    vis.legendRect.attr("fill", "url(#legend-gradient)");
   }
 }
