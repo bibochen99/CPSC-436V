@@ -15,7 +15,6 @@ class ChoroplethMap {
       legendLeft: 50,
       legendRectHeight: 12,
       legendRectWidth: 150,
-      steps: ["step0", "step1"],
     };
     this.geoData = _geoData;
     this.data = _data;
@@ -89,32 +88,23 @@ class ChoroplethMap {
         })`
       );
 
-    vis.geoJoinPath = vis.chart
-      .selectAll(".geo-path")
-      .data(
-        topojson.feature(vis.geoData, vis.geoData.objects.world_countries)
-          .features
-      )
-      .join("path");
-
-    vis.legendTitle = vis.legend
-      .append("text")
-      .attr("class", "legend-title")
-      .attr("dy", ".35em")
-      .attr("y", -10);
-
-    vis.step0();
-  }
-
-  step0() {
-    let vis = this;
-
     vis.legendRect = vis.legend
       .append("rect")
       .attr("width", vis.config.legendRectWidth)
       .attr("height", vis.config.legendRectHeight);
 
-    vis.legendTitle.text("Life Ladder");
+    vis.legendTitle = vis.legend
+      .append("text")
+      .attr("class", "legend-title")
+      .attr("dy", ".35em")
+      .attr("y", -10)
+      .text("Life Ladder");
+
+    vis.updateVis();
+  }
+
+  updateVis() {
+    let vis = this;
 
     vis.mapValue = d3.extent(
       vis.geoData.objects.world_countries.geometries,
@@ -124,17 +114,23 @@ class ChoroplethMap {
     let range = d3.extent(vis.data, (d) => d["Life Ladder"]);
     let min = range[0],
       max = range[1];
-
+    console.log(range);
     vis.geoData.objects.world_countries.geometries.forEach((d) => {
       if (d.properties.lifeLadder == max) {
         d.properties.isMax = 1;
+        console.log("max");
       } else if (d.properties.lifeLadder == min) {
         d.properties.isMin = 1;
+        console.log("min");
       } else {
         d.properties.isMax = 0;
         d.properties.isMin = 0;
       }
     });
+
+    // console.log(vis.geoData);
+    // Update color domain
+    // vis.colorScale.domain(["few", "mid", "lar"]);
 
     vis.colorScale.domain(vis.mapValue);
 
@@ -150,23 +146,34 @@ class ChoroplethMap {
   renderVis() {
     let vis = this;
 
+    // Convert compressed TopoJSON to GeoJSON format
+    const countries = topojson.feature(vis.geoData,vis.geoData.objects.world_countries);
+
+    // Defines the scale of the projection so that the geometry fits within the SVG area
+    // vis.projection.fitSize([vis.width, vis.height], countries);
+
     // Append world map
-    vis.geoJoinPath
-      .transition()
+    const geoPath = vis.chart
+      .selectAll(".geo-path")
+      .data(
+        topojson.feature(vis.geoData, vis.geoData.objects.world_countries)
+          .features
+      )
+      .join("path")
       .attr("class", "geo-path")
       .attr("d", vis.geoPath)
       .attr("fill", (d) => {
         if (d.properties.isMax == 1) {
           return "#F4CF49";
-        } else if (d.properties.isMin == 1) {
+        } else if(d.properties.isMin == 1){
           return "#F8E6A5";
-        } else {
+        }else {
           return vis.colorScale(d.properties.lifeLadder);
         }
       });
 
     //tooltip
-    vis.geoJoinPath
+    geoPath
       .on("mousemove", (event, d) => {
         let name = d.properties.name;
         let ladder = d.properties.lifeLadder ? d.properties.lifeLadder : "N/A";
@@ -207,105 +214,7 @@ class ChoroplethMap {
       .join("stop")
       .attr("offset", (d) => d.offset)
       .attr("stop-color", (d) => d.color);
-    vis.legendRect.attr("fill", "url(#legend-gradient)");
-  }
-
-  step1() {
-    console.log("step1");
-
-    let vis = this;
-    d3.select("#legend-title").remove();
-    vis.legendTitle.text("Social Support");
-
-    vis.mapValue = d3.extent(
-      vis.geoData.objects.world_countries.geometries,
-      (d) => d.properties.socialSupport
-    );
-    let range = d3.extent(vis.data, (d) => d["Social support"]);
-    let min = range[0],
-      max = range[1];
-    vis.geoData.objects.world_countries.geometries.forEach((d) => {
-      d.properties.isMax = 0;
-      d.properties.isMin = 0;
-    });
-
-    vis.geoData.objects.world_countries.geometries.forEach((d) => {
-      if (d.properties.socialSupport == max) {
-        d.properties.isMax = 1;
-      } else if (d.properties.socialSupport == min) {
-        d.properties.isMin = 1;
-      } else {
-        d.properties.isMax = 0;
-        d.properties.isMin = 0;
-      }
-    });
-    vis.colorScale.domain(vis.mapValue);
-    vis.legendStops = [
-      { color: "lightgreen", value: min, offset: 0 },
-      { color: "green", value: max, offset: 100 },
-    ];
-    vis.symbolScale.domain(d3.extent(vis.data, (d) => d["Life Ladder"]));
-
-    // Append world map
-    vis.geoJoinPath
-      .transition()
-      .attr("d", vis.geoPath)
-      .attr("fill", (d) => {
-        if (d.properties.isMax == 1) {
-          return "#F4CF49";
-        } else if (d.properties.isMin == 1) {
-          return "#F8E6A5";
-        } else {
-          return vis.colorScale(d.properties.socialSupport);
-        }
-      });
-    vis.geoJoinPath
-      .on("mousemove", (event, d) => {
-        let name = d.properties.name;
-        let ladder = d.properties.socialSupport
-          ? d.properties.socialSupport
-          : "N/A";
-        d3
-          .select("#map-tooltip")
-          .style("display", "block")
-          .style("left", event.pageX + vis.config.tooltipPadding + "px")
-          .style("top", event.pageY + vis.config.tooltipPadding + "px").html(`
-            <div class="tooltip-title">${name}</div>
-            <ul>
-            <li>Social Support: ${ladder}</li>
-  
-          </ul>
-            `);
-      })
-      .on("mouseleave", () => {
-        d3.select("#tooltip").style("display", "none");
-      });
-    // Add legend labels
-    vis.legend
-      .selectAll(".legend-label")
-      .data(vis.legendStops)
-      .join("text")
-      .attr("class", "legend-label")
-      .attr("text-anchor", "middle")
-      .attr("dy", ".35em")
-      .attr("y", 20)
-      .attr("x", (d, index) => {
-        return index == 0 ? 0 : vis.config.legendRectWidth;
-      })
-      .text((d) => Math.round(d.value * 10) / 10);
-
-    // Update gradient for legend
-    vis.linearGradient
-      .selectAll("stop")
-      .data(vis.legendStops)
-      .join("stop")
-      .attr("offset", (d) => d.offset)
-      .attr("stop-color", (d) => d.color);
 
     vis.legendRect.attr("fill", "url(#legend-gradient)");
-  }
-
-  goToStep(stepIndex) {
-    this[this.config.steps[stepIndex]]();
   }
 }
