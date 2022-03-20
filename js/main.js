@@ -41,6 +41,13 @@ Promise.all([
           d.properties.year = inputYear;
           d.properties.lifeLadder = data[i]["Life Ladder"];
           d.properties.socialSupport = data[i]["Social support"];
+          d.properties.gdp = data[i]["Log GDP per capita"];
+          d.properties.healthyLife = data[i]["Healthy life expectancy at birth"];
+          d.properties.free = data[i]["Freedom to make life choices"];
+          d.properties.perceptions = data[i]["Perceptions of corruption"];
+          d.properties.positive = data[i]["Positive affect"];
+          d.properties.negative = data[i]["Negative affect"];
+          d.properties.generosity = data[i]["Generosity"];
         }
       }
     }
