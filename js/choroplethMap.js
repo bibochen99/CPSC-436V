@@ -15,7 +15,17 @@ class ChoroplethMap {
       legendLeft: 50,
       legendRectHeight: 12,
       legendRectWidth: 150,
-      steps: ["step0", "step1"],
+      steps: [
+        "step0",
+        "step1",
+        "step2",
+        "step3",
+        "step4",
+        "step5",
+        "step6",
+        "step7",
+        "step8",
+      ],
     };
     this.geoData = _geoData;
     this.data = _data;
@@ -63,8 +73,6 @@ class ChoroplethMap {
       .translate([vis.width / 2, vis.height / 2]); // ensure centered within svg group
 
     vis.geoPath = d3.geoPath().projection(vis.projection);
-
-    vis.symbolScale = d3.scaleSqrt().range([4, 25]);
 
     // vis.colorScale = d3.scaleOrdinal().range(["#d3eecd", "#7bc77e", "#2a8d46"]); // light green to dark green
     vis.colorScale = d3
@@ -143,7 +151,7 @@ class ChoroplethMap {
       { color: "#cfe2f2", value: min, offset: 0 },
       { color: "#0d306b", value: max, offset: 100 },
     ];
-    vis.symbolScale.domain(d3.extent(vis.data, (d) => d["Life Ladder"]));
+
     vis.renderVis();
   }
 
@@ -211,10 +219,7 @@ class ChoroplethMap {
   }
 
   step1() {
-    console.log("step1");
-
     let vis = this;
-    d3.select("#legend-title").remove();
     vis.legendTitle.text("Social Support");
 
     vis.mapValue = d3.extent(
@@ -244,7 +249,6 @@ class ChoroplethMap {
       { color: "lightgreen", value: min, offset: 0 },
       { color: "green", value: max, offset: 100 },
     ];
-    vis.symbolScale.domain(d3.extent(vis.data, (d) => d["Life Ladder"]));
 
     // Append world map
     vis.geoJoinPath
@@ -273,6 +277,633 @@ class ChoroplethMap {
             <div class="tooltip-title">${name}</div>
             <ul>
             <li>Social Support: ${ladder}</li>
+  
+          </ul>
+            `);
+      })
+      .on("mouseleave", () => {
+        d3.select("#tooltip").style("display", "none");
+      });
+    // Add legend labels
+    vis.legend
+      .selectAll(".legend-label")
+      .data(vis.legendStops)
+      .join("text")
+      .attr("class", "legend-label")
+      .attr("text-anchor", "middle")
+      .attr("dy", ".35em")
+      .attr("y", 20)
+      .attr("x", (d, index) => {
+        return index == 0 ? 0 : vis.config.legendRectWidth;
+      })
+      .text((d) => Math.round(d.value * 10) / 10);
+
+    // Update gradient for legend
+    vis.linearGradient
+      .selectAll("stop")
+      .data(vis.legendStops)
+      .join("stop")
+      .attr("offset", (d) => d.offset)
+      .attr("stop-color", (d) => d.color);
+
+    vis.legendRect.attr("fill", "url(#legend-gradient)");
+  }
+
+  step2() {
+    let vis = this;
+    vis.legendTitle.text("Log GDP per capita");
+
+    vis.mapValue = d3.extent(
+      vis.geoData.objects.world_countries.geometries,
+      (d) => d.properties.gdp
+    );
+    let range = d3.extent(vis.data, (d) => d["Log GDP per capita"]);
+    let min = range[0],
+      max = range[1];
+    vis.geoData.objects.world_countries.geometries.forEach((d) => {
+      d.properties.isMax = 0;
+      d.properties.isMin = 0;
+    });
+
+    vis.geoData.objects.world_countries.geometries.forEach((d) => {
+      if (d.properties.gdp == max) {
+        d.properties.isMax = 1;
+      } else if (d.properties.gdp == min) {
+        d.properties.isMin = 1;
+      } else {
+        d.properties.isMax = 0;
+        d.properties.isMin = 0;
+      }
+    });
+    vis.colorScale.domain(vis.mapValue);
+    vis.legendStops = [
+      { color: "lightgreen", value: min, offset: 0 },
+      { color: "green", value: max, offset: 100 },
+    ];
+
+    // Append world map
+    vis.geoJoinPath
+      .transition()
+      .attr("d", vis.geoPath)
+      .attr("fill", (d) => {
+        if (d.properties.isMax == 1) {
+          return "#F4CF49";
+        } else if (d.properties.isMin == 1) {
+          return "#F8E6A5";
+        } else {
+          return vis.colorScale(d.properties.gdp);
+        }
+      });
+    vis.geoJoinPath
+      .on("mousemove", (event, d) => {
+        let name = d.properties.name;
+        let ladder = d.properties.gdp ? d.properties.gdp : "N/A";
+        d3
+          .select("#map-tooltip")
+          .style("display", "block")
+          .style("left", event.pageX + vis.config.tooltipPadding + "px")
+          .style("top", event.pageY + vis.config.tooltipPadding + "px").html(`
+            <div class="tooltip-title">${name}</div>
+            <ul>
+            <li>Log GDP per capita: ${ladder}</li>
+  
+          </ul>
+            `);
+      })
+      .on("mouseleave", () => {
+        d3.select("#tooltip").style("display", "none");
+      });
+    // Add legend labels
+    vis.legend
+      .selectAll(".legend-label")
+      .data(vis.legendStops)
+      .join("text")
+      .attr("class", "legend-label")
+      .attr("text-anchor", "middle")
+      .attr("dy", ".35em")
+      .attr("y", 20)
+      .attr("x", (d, index) => {
+        return index == 0 ? 0 : vis.config.legendRectWidth;
+      })
+      .text((d) => Math.round(d.value * 10) / 10);
+
+    // Update gradient for legend
+    vis.linearGradient
+      .selectAll("stop")
+      .data(vis.legendStops)
+      .join("stop")
+      .attr("offset", (d) => d.offset)
+      .attr("stop-color", (d) => d.color);
+
+    vis.legendRect.attr("fill", "url(#legend-gradient)");
+  }
+  step3() {
+    let vis = this;
+    vis.legendTitle.text("Healthy life expectancy at birth");
+
+    vis.mapValue = d3.extent(
+      vis.geoData.objects.world_countries.geometries,
+      (d) => d.properties.healthyLife
+    );
+    let range = d3.extent(
+      vis.data,
+      (d) => d["Healthy life expectancy at birth"]
+    );
+    let min = range[0],
+      max = range[1];
+    vis.geoData.objects.world_countries.geometries.forEach((d) => {
+      d.properties.isMax = 0;
+      d.properties.isMin = 0;
+    });
+
+    vis.geoData.objects.world_countries.geometries.forEach((d) => {
+      if (d.properties.healthyLife == max) {
+        d.properties.isMax = 1;
+      } else if (d.properties.healthyLife == min) {
+        d.properties.isMin = 1;
+      } else {
+        d.properties.isMax = 0;
+        d.properties.isMin = 0;
+      }
+    });
+    vis.colorScale.domain(vis.mapValue);
+    vis.legendStops = [
+      { color: "lightgreen", value: min, offset: 0 },
+      { color: "green", value: max, offset: 100 },
+    ];
+
+    // Append world map
+    vis.geoJoinPath
+      .transition()
+      .attr("d", vis.geoPath)
+      .attr("fill", (d) => {
+        if (d.properties.isMax == 1) {
+          return "#F4CF49";
+        } else if (d.properties.isMin == 1) {
+          return "#F8E6A5";
+        } else {
+          return vis.colorScale(d.properties.healthyLife);
+        }
+      });
+    vis.geoJoinPath
+      .on("mousemove", (event, d) => {
+        let name = d.properties.name;
+        let ladder = d.properties.healthyLife
+          ? d.properties.healthyLife
+          : "N/A";
+        d3
+          .select("#map-tooltip")
+          .style("display", "block")
+          .style("left", event.pageX + vis.config.tooltipPadding + "px")
+          .style("top", event.pageY + vis.config.tooltipPadding + "px").html(`
+            <div class="tooltip-title">${name}</div>
+            <ul>
+            <li>Healthy life expectancy at birth: ${ladder}</li>
+  
+          </ul>
+            `);
+      })
+      .on("mouseleave", () => {
+        d3.select("#tooltip").style("display", "none");
+      });
+    // Add legend labels
+    vis.legend
+      .selectAll(".legend-label")
+      .data(vis.legendStops)
+      .join("text")
+      .attr("class", "legend-label")
+      .attr("text-anchor", "middle")
+      .attr("dy", ".35em")
+      .attr("y", 20)
+      .attr("x", (d, index) => {
+        return index == 0 ? 0 : vis.config.legendRectWidth;
+      })
+      .text((d) => Math.round(d.value * 10) / 10);
+
+    // Update gradient for legend
+    vis.linearGradient
+      .selectAll("stop")
+      .data(vis.legendStops)
+      .join("stop")
+      .attr("offset", (d) => d.offset)
+      .attr("stop-color", (d) => d.color);
+
+    vis.legendRect.attr("fill", "url(#legend-gradient)");
+  }
+  step4() {
+    let vis = this;
+    vis.legendTitle.text("Freedom to make life choices");
+
+    vis.mapValue = d3.extent(
+      vis.geoData.objects.world_countries.geometries,
+      (d) => d.properties.free
+    );
+    let range = d3.extent(vis.data, (d) => d["Freedom to make life choices"]);
+    let min = range[0],
+      max = range[1];
+    vis.geoData.objects.world_countries.geometries.forEach((d) => {
+      d.properties.isMax = 0;
+      d.properties.isMin = 0;
+    });
+
+    vis.geoData.objects.world_countries.geometries.forEach((d) => {
+      if (d.properties.free == max) {
+        d.properties.isMax = 1;
+      } else if (d.properties.free == min) {
+        d.properties.isMin = 1;
+      } else {
+        d.properties.isMax = 0;
+        d.properties.isMin = 0;
+      }
+    });
+    vis.colorScale.domain(vis.mapValue);
+    vis.legendStops = [
+      { color: "lightgreen", value: min, offset: 0 },
+      { color: "green", value: max, offset: 100 },
+    ];
+
+    // Append world map
+    vis.geoJoinPath
+      .transition()
+      .attr("d", vis.geoPath)
+      .attr("fill", (d) => {
+        if (d.properties.isMax == 1) {
+          return "#F4CF49";
+        } else if (d.properties.isMin == 1) {
+          return "#F8E6A5";
+        } else {
+          return vis.colorScale(d.properties.free);
+        }
+      });
+    vis.geoJoinPath
+      .on("mousemove", (event, d) => {
+        let name = d.properties.name;
+        let ladder = d.properties.free ? d.properties.free : "N/A";
+        d3
+          .select("#map-tooltip")
+          .style("display", "block")
+          .style("left", event.pageX + vis.config.tooltipPadding + "px")
+          .style("top", event.pageY + vis.config.tooltipPadding + "px").html(`
+            <div class="tooltip-title">${name}</div>
+            <ul>
+            <li>Freedom to make life choices: ${ladder}</li>
+  
+          </ul>
+            `);
+      })
+      .on("mouseleave", () => {
+        d3.select("#tooltip").style("display", "none");
+      });
+    // Add legend labels
+    vis.legend
+      .selectAll(".legend-label")
+      .data(vis.legendStops)
+      .join("text")
+      .attr("class", "legend-label")
+      .attr("text-anchor", "middle")
+      .attr("dy", ".35em")
+      .attr("y", 20)
+      .attr("x", (d, index) => {
+        return index == 0 ? 0 : vis.config.legendRectWidth;
+      })
+      .text((d) => Math.round(d.value * 10) / 10);
+
+    // Update gradient for legend
+    vis.linearGradient
+      .selectAll("stop")
+      .data(vis.legendStops)
+      .join("stop")
+      .attr("offset", (d) => d.offset)
+      .attr("stop-color", (d) => d.color);
+
+    vis.legendRect.attr("fill", "url(#legend-gradient)");
+  }
+  step5() {
+    let vis = this;
+    vis.legendTitle.text("Perceptions of corruption");
+
+    vis.mapValue = d3.extent(
+      vis.geoData.objects.world_countries.geometries,
+      (d) => d.properties.perceptions
+    );
+    let range = d3.extent(vis.data, (d) => d["Perceptions of corruption"]);
+    let min = range[0],
+      max = range[1];
+    vis.geoData.objects.world_countries.geometries.forEach((d) => {
+      d.properties.isMax = 0;
+      d.properties.isMin = 0;
+    });
+
+    vis.geoData.objects.world_countries.geometries.forEach((d) => {
+      if (d.properties.perceptions == max) {
+        d.properties.isMax = 1;
+      } else if (d.properties.perceptions == min) {
+        d.properties.isMin = 1;
+      } else {
+        d.properties.isMax = 0;
+        d.properties.isMin = 0;
+      }
+    });
+    vis.colorScale.domain(vis.mapValue);
+    vis.legendStops = [
+      { color: "lightgreen", value: min, offset: 0 },
+      { color: "green", value: max, offset: 100 },
+    ];
+
+    // Append world map
+    vis.geoJoinPath
+      .transition()
+      .attr("d", vis.geoPath)
+      .attr("fill", (d) => {
+        if (d.properties.isMax == 1) {
+          return "#F4CF49";
+        } else if (d.properties.isMin == 1) {
+          return "#F8E6A5";
+        } else {
+          return vis.colorScale(d.properties.perceptions);
+        }
+      });
+    vis.geoJoinPath
+      .on("mousemove", (event, d) => {
+        let name = d.properties.name;
+        let ladder;
+        if (d.properties.perceptions === undefined) {
+          ladder = "N/A";
+        } else {
+          ladder = d.properties.perceptions;
+        }
+        d3
+          .select("#map-tooltip")
+          .style("display", "block")
+          .style("left", event.pageX + vis.config.tooltipPadding + "px")
+          .style("top", event.pageY + vis.config.tooltipPadding + "px").html(`
+            <div class="tooltip-title">${name}</div>
+            <ul>
+            <li>Perceptions of corruption: ${ladder}</li>
+  
+          </ul>
+            `);
+      })
+      .on("mouseleave", () => {
+        d3.select("#tooltip").style("display", "none");
+      });
+    // Add legend labels
+    vis.legend
+      .selectAll(".legend-label")
+      .data(vis.legendStops)
+      .join("text")
+      .attr("class", "legend-label")
+      .attr("text-anchor", "middle")
+      .attr("dy", ".35em")
+      .attr("y", 20)
+      .attr("x", (d, index) => {
+        return index == 0 ? 0 : vis.config.legendRectWidth;
+      })
+      .text((d) => Math.round(d.value * 10) / 10);
+
+    // Update gradient for legend
+    vis.linearGradient
+      .selectAll("stop")
+      .data(vis.legendStops)
+      .join("stop")
+      .attr("offset", (d) => d.offset)
+      .attr("stop-color", (d) => d.color);
+
+    vis.legendRect.attr("fill", "url(#legend-gradient)");
+  }
+  step6() {
+    let vis = this;
+    vis.legendTitle.text("Positive affect");
+
+    vis.mapValue = d3.extent(
+      vis.geoData.objects.world_countries.geometries,
+      (d) => d.properties.positive
+    );
+    let range = d3.extent(vis.data, (d) => d["Positive affect"]);
+    let min = range[0],
+      max = range[1];
+    vis.geoData.objects.world_countries.geometries.forEach((d) => {
+      d.properties.isMax = 0;
+      d.properties.isMin = 0;
+    });
+
+    vis.geoData.objects.world_countries.geometries.forEach((d) => {
+      if (d.properties.positive == max) {
+        d.properties.isMax = 1;
+      } else if (d.properties.positive == min) {
+        d.properties.isMin = 1;
+      } else {
+        d.properties.isMax = 0;
+        d.properties.isMin = 0;
+      }
+    });
+    vis.colorScale.domain(vis.mapValue);
+    vis.legendStops = [
+      { color: "lightgreen", value: min, offset: 0 },
+      { color: "green", value: max, offset: 100 },
+    ];
+
+    // Append world map
+    vis.geoJoinPath
+      .transition()
+      .attr("d", vis.geoPath)
+      .attr("fill", (d) => {
+        if (d.properties.isMax == 1) {
+          return "#F4CF49";
+        } else if (d.properties.isMin == 1) {
+          return "#F8E6A5";
+        } else {
+          return vis.colorScale(d.properties.positive);
+        }
+      });
+    vis.geoJoinPath
+      .on("mousemove", (event, d) => {
+        let name = d.properties.name;
+        let ladder = d.properties.positive ? d.properties.positive : "N/A";
+        d3
+          .select("#map-tooltip")
+          .style("display", "block")
+          .style("left", event.pageX + vis.config.tooltipPadding + "px")
+          .style("top", event.pageY + vis.config.tooltipPadding + "px").html(`
+            <div class="tooltip-title">${name}</div>
+            <ul>
+            <li>Positive affect: ${ladder}</li>
+  
+          </ul>
+            `);
+      })
+      .on("mouseleave", () => {
+        d3.select("#tooltip").style("display", "none");
+      });
+    // Add legend labels
+    vis.legend
+      .selectAll(".legend-label")
+      .data(vis.legendStops)
+      .join("text")
+      .attr("class", "legend-label")
+      .attr("text-anchor", "middle")
+      .attr("dy", ".35em")
+      .attr("y", 20)
+      .attr("x", (d, index) => {
+        return index == 0 ? 0 : vis.config.legendRectWidth;
+      })
+      .text((d) => Math.round(d.value * 10) / 10);
+
+    // Update gradient for legend
+    vis.linearGradient
+      .selectAll("stop")
+      .data(vis.legendStops)
+      .join("stop")
+      .attr("offset", (d) => d.offset)
+      .attr("stop-color", (d) => d.color);
+
+    vis.legendRect.attr("fill", "url(#legend-gradient)");
+  }
+  step7() {
+    let vis = this;
+    vis.legendTitle.text("Negative affect");
+
+    vis.mapValue = d3.extent(
+      vis.geoData.objects.world_countries.geometries,
+      (d) => d.properties.negative
+    );
+    let range = d3.extent(vis.data, (d) => d["Negative affect"]);
+    let min = range[0],
+      max = range[1];
+    vis.geoData.objects.world_countries.geometries.forEach((d) => {
+      d.properties.isMax = 0;
+      d.properties.isMin = 0;
+    });
+
+    vis.geoData.objects.world_countries.geometries.forEach((d) => {
+      if (d.properties.negative == max) {
+        d.properties.isMax = 1;
+      } else if (d.properties.negative == min) {
+        d.properties.isMin = 1;
+      } else {
+        d.properties.isMax = 0;
+        d.properties.isMin = 0;
+      }
+    });
+    vis.colorScale.domain(vis.mapValue);
+    vis.legendStops = [
+      { color: "lightgreen", value: min, offset: 0 },
+      { color: "green", value: max, offset: 100 },
+    ];
+
+    // Append world map
+    vis.geoJoinPath
+      .transition()
+      .attr("d", vis.geoPath)
+      .attr("fill", (d) => {
+        if (d.properties.isMax == 1) {
+          return "#F4CF49";
+        } else if (d.properties.isMin == 1) {
+          return "#F8E6A5";
+        } else {
+          return vis.colorScale(d.properties.negative);
+        }
+      });
+    vis.geoJoinPath
+      .on("mousemove", (event, d) => {
+        let name = d.properties.name;
+        let ladder = d.properties.negative ? d.properties.negative : "N/A";
+        d3
+          .select("#map-tooltip")
+          .style("display", "block")
+          .style("left", event.pageX + vis.config.tooltipPadding + "px")
+          .style("top", event.pageY + vis.config.tooltipPadding + "px").html(`
+            <div class="tooltip-title">${name}</div>
+            <ul>
+            <li>Negative affect: ${ladder}</li>
+  
+          </ul>
+            `);
+      })
+      .on("mouseleave", () => {
+        d3.select("#tooltip").style("display", "none");
+      });
+    // Add legend labels
+    vis.legend
+      .selectAll(".legend-label")
+      .data(vis.legendStops)
+      .join("text")
+      .attr("class", "legend-label")
+      .attr("text-anchor", "middle")
+      .attr("dy", ".35em")
+      .attr("y", 20)
+      .attr("x", (d, index) => {
+        return index == 0 ? 0 : vis.config.legendRectWidth;
+      })
+      .text((d) => Math.round(d.value * 10) / 10);
+
+    // Update gradient for legend
+    vis.linearGradient
+      .selectAll("stop")
+      .data(vis.legendStops)
+      .join("stop")
+      .attr("offset", (d) => d.offset)
+      .attr("stop-color", (d) => d.color);
+
+    vis.legendRect.attr("fill", "url(#legend-gradient)");
+  }
+  step8() {
+    let vis = this;
+    vis.legendTitle.text("Generosity");
+
+    vis.mapValue = d3.extent(
+      vis.geoData.objects.world_countries.geometries,
+      (d) => d.properties.generosity
+    );
+    let range = d3.extent(vis.data, (d) => d["Generosity"]);
+    let min = range[0],
+      max = range[1];
+    vis.geoData.objects.world_countries.geometries.forEach((d) => {
+      d.properties.isMax = 0;
+      d.properties.isMin = 0;
+    });
+
+    vis.geoData.objects.world_countries.geometries.forEach((d) => {
+      if (d.properties.generosity == max) {
+        d.properties.isMax = 1;
+      } else if (d.properties.generosity == min) {
+        d.properties.isMin = 1;
+      } else {
+        d.properties.isMax = 0;
+        d.properties.isMin = 0;
+      }
+    });
+    vis.colorScale.domain(vis.mapValue);
+    vis.legendStops = [
+      { color: "lightgreen", value: min, offset: 0 },
+      { color: "green", value: max, offset: 100 },
+    ];
+
+    // Append world map
+    vis.geoJoinPath
+      .transition()
+      .attr("d", vis.geoPath)
+      .attr("fill", (d) => {
+        if (d.properties.isMax == 1) {
+          return "#F4CF49";
+        } else if (d.properties.isMin == 1) {
+          return "#F8E6A5";
+        } else {
+          return vis.colorScale(d.properties.generosity);
+        }
+      });
+    vis.geoJoinPath
+      .on("mousemove", (event, d) => {
+        let name = d.properties.name;
+        let ladder = d.properties.generosity ? d.properties.generosity : "N/A";
+        d3
+          .select("#map-tooltip")
+          .style("display", "block")
+          .style("left", event.pageX + vis.config.tooltipPadding + "px")
+          .style("top", event.pageY + vis.config.tooltipPadding + "px").html(`
+            <div class="tooltip-title">${name}</div>
+            <ul>
+            <li>Generosity: ${ladder}</li>
   
           </ul>
             `);
