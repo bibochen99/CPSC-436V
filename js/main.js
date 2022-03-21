@@ -1,7 +1,7 @@
 /**
  * Load and combine data
  */
-let geoData, data, lanLonData, choroplethMap;
+let geoData, data, lanLonData, choroplethMap, spiderChart;
 Promise.all([
   d3.json("data/world_countries_topo.json"),
   d3.csv("data/world-happiness-report.csv"),
@@ -22,6 +22,7 @@ Promise.all([
     d["Perceptions of corruption"] = +d["Perceptions of corruption"];
     d["Positive affect"] = +d["Positive affect"];
     d["Negative affect"] = +d["Negative affect"];
+    d.Display = false;
     lanLonData.forEach((data) => {
       if (d["Country name"] == data["country"]) d["lat"] = data["latitude"];
       d["lon"] = data["longitude"];
@@ -57,6 +58,16 @@ Promise.all([
     return d.year == 2013;
   });
 
+  let range = d3.extent(entryData, (d) => d["Life Ladder"]);
+  let min = range[0],
+    max = range[1];
+  
+  entryData.forEach((d) => {
+    if (d["Life Ladder"] == max || d["Life Ladder"] == min) {
+      d.Display = true;
+    }
+  });
+
   // choroplethMap init
   choroplethMap = new ChoroplethMap(
     {
@@ -83,4 +94,11 @@ Promise.all([
       offset: "50%",
     });
   });
+
+  spiderChart = new SpiderChart(
+    {
+      parentElement: "#spider",
+    },
+    entryData
+  );
 });
