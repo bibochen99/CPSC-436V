@@ -4,17 +4,18 @@ class ChoroplethMap {
    * @param {Object}
    * @param {Array}
    */
-  constructor(_config, _geoData, _data) {
+  constructor(_config, _geoData, _data, _dispatcher) {
     this.config = {
       parentElement: _config.parentElement,
       containerWidth: _config.containerWidth || 800,
       containerHeight: _config.containerHeight || 300,
-      margin: _config.margin || { top: 0, right: 0, bottom: 0, left: 0 },
+      margin: _config.margin || { top: 20, right: 20, bottom: 20, left: 20 },
       tooltipPadding: 10,
       legendBottom: 50,
       legendLeft: 50,
       legendRectHeight: 12,
       legendRectWidth: 150,
+      currYear: 2013,
       steps: [
         "step0",
         "step1",
@@ -29,6 +30,7 @@ class ChoroplethMap {
     };
     this.geoData = _geoData;
     this.data = _data;
+    this._dispatcher = _dispatcher;
     this.initVis();
   }
 
@@ -111,7 +113,61 @@ class ChoroplethMap {
       .attr("dy", ".35em")
       .attr("y", -10);
 
+    // Time slider
+    // source: https://bl.ocks.org/johnwalley/e1d256b81e51da68f7feb632a53c3518
+    vis.dataTime = d3.range(0, 16).map(function(d) {
+      return new Date(2005 + d, 1, 1);
+    });
+
+    vis.yearSlider = d3
+      .sliderBottom()
+      .min(d3.min(vis.dataTime))
+      .max(d3.max(vis.dataTime))
+      .step(1000 * 60 * 60 * 24 * 365)
+      .width(500)
+      .tickFormat(d3.timeFormat('%Y'))
+      .tickValues(vis.dataTime)
+      .default(new Date(2013, 1, 1))
+      .on('onchange', val => {
+        d3.select('p#value-time').text(d3.timeFormat('%Y')(val));
+        vis.config.currYear = d3.timeFormat('%Y')(val);
+        vis.step0();
+      });
+    
+    d3.select('div#year-slider')
+      .append('svg')
+      .attr('width', 550)
+      .attr('height', 100)
+      .append('g')
+      .attr('transform', 'translate(30,30)')
+      .call(vis.yearSlider);
+    
+    // d3.select('p#value-time').text(d3.timeFormat('%Y')(vis.yearSlider.value()));
+
     vis.step0();
+  }
+
+  filterGeoData(inputYear) {
+    let vis = this;
+    // vis.geoData.objects.world_countries.geometries = {};
+    vis.geoData.objects.world_countries.geometries.forEach((d) => {
+      for (let i = 0; i < vis.data.length; i++) {
+        if (d.properties.name == vis.data[i]["Country name"]) {
+          if (vis.data[i].year === inputYear) {
+            d.properties.year = vis.data[i]["year"];
+            d.properties.lifeLadder = vis.data[i]["Life Ladder"];
+            d.properties.socialSupport = vis.data[i]["Social support"];
+            d.properties.gdp = vis.data[i]["Log GDP per capita"];
+            d.properties.healthyLife = vis.data[i]["Healthy life expectancy at birth"];
+            d.properties.free = vis.data[i]["Freedom to make life choices"];
+            d.properties.perceptions = vis.data[i]["Perceptions of corruption"];
+            d.properties.positive = vis.data[i]["Positive affect"];
+            d.properties.negative = vis.data[i]["Negative affect"];
+            d.properties.generosity = vis.data[i]["Generosity"];
+          }
+        }
+      }
+    });
   }
 
   step0() {
@@ -124,17 +180,42 @@ class ChoroplethMap {
 
     vis.legendTitle.text("Life Ladder");
 
+    vis.filteredData = vis.data.filter((d) => {
+      return d.year == vis.config.currYear;
+    });
+
+    vis.geoData.objects.world_countries.geometries.forEach((d) => {
+      for (let i = 0; i < vis.filteredData.length; i++) {
+        if (d.properties.name == vis.filteredData[i]["Country name"]) {
+          // if (vis.data[i].year === inputYear) {
+            d.properties.year = vis.filteredData[i]["year"];
+            d.properties.lifeLadder = vis.filteredData[i]["Life Ladder"];
+            d.properties.socialSupport = vis.filteredData[i]["Social support"];
+            d.properties.gdp = vis.filteredData[i]["Log GDP per capita"];
+            d.properties.healthyLife = vis.filteredData[i]["Healthy life expectancy at birth"];
+            d.properties.free = vis.filteredData[i]["Freedom to make life choices"];
+            d.properties.perceptions = vis.filteredData[i]["Perceptions of corruption"];
+            d.properties.positive = vis.filteredData[i]["Positive affect"];
+            d.properties.negative = vis.filteredData[i]["Negative affect"];
+            d.properties.generosity = vis.filteredData[i]["Generosity"];
+          // }
+        }
+      }
+    });
+
     vis.mapValue = d3.extent(
       vis.geoData.objects.world_countries.geometries,
       (d) => d.properties.lifeLadder
     );
 
-    let range = d3.extent(vis.data, (d) => d["Life Ladder"]);
+    console.log(vis.mapValue);
+
+    let range = d3.extent(vis.filteredData, (d) => d["Life Ladder"]);
     let min = range[0],
       max = range[1];
 
     vis.geoData.objects.world_countries.geometries.forEach((d) => {
-      if (d.properties.lifeLadder == max) {
+      if (d.properties.lifeLadder == max && d.properties.year == vis.config.currYear) {
         d.properties.isMax = 1;
       } else if (d.properties.lifeLadder == min) {
         d.properties.isMin = 1;
@@ -184,14 +265,11 @@ class ChoroplethMap {
           .style("left", event.pageX + vis.config.tooltipPadding + "px")
           .style("top", event.pageY + vis.config.tooltipPadding + "px").html(`
           <div class="tooltip-title">${name}</div>
-          <ul>
-          <li>Life Ladder: ${ladder}</li>
-
-        </ul>
+          Life Ladder: ${ladder}
           `);
       })
       .on("mouseleave", () => {
-        d3.select("#tooltip").style("display", "none");
+        d3.select("#map-tooltip").style("display", "none");
       });
 
     // Add legend labels
@@ -226,7 +304,7 @@ class ChoroplethMap {
       vis.geoData.objects.world_countries.geometries,
       (d) => d.properties.socialSupport
     );
-    let range = d3.extent(vis.data, (d) => d["Social support"]);
+    let range = d3.extent(vis.filteredData, (d) => d["Social support"]);
     let min = range[0],
       max = range[1];
     vis.geoData.objects.world_countries.geometries.forEach((d) => {
@@ -235,7 +313,7 @@ class ChoroplethMap {
     });
 
     vis.geoData.objects.world_countries.geometries.forEach((d) => {
-      if (d.properties.socialSupport == max) {
+      if (d.properties.socialSupport == max && d.properties.year == vis.config.currYear) {
         d.properties.isMax = 1;
       } else if (d.properties.socialSupport == min) {
         d.properties.isMin = 1;
@@ -275,14 +353,11 @@ class ChoroplethMap {
           .style("left", event.pageX + vis.config.tooltipPadding + "px")
           .style("top", event.pageY + vis.config.tooltipPadding + "px").html(`
             <div class="tooltip-title">${name}</div>
-            <ul>
-            <li>Social Support: ${ladder}</li>
-  
-          </ul>
+            Social Support: ${ladder}
             `);
       })
       .on("mouseleave", () => {
-        d3.select("#tooltip").style("display", "none");
+        d3.select("#map-tooltip").style("display", "none");
       });
     // Add legend labels
     vis.legend
@@ -317,7 +392,7 @@ class ChoroplethMap {
       vis.geoData.objects.world_countries.geometries,
       (d) => d.properties.gdp
     );
-    let range = d3.extent(vis.data, (d) => d["Log GDP per capita"]);
+    let range = d3.extent(vis.filteredData, (d) => d["Log GDP per capita"]);
     let min = range[0],
       max = range[1];
     vis.geoData.objects.world_countries.geometries.forEach((d) => {
@@ -364,10 +439,7 @@ class ChoroplethMap {
           .style("left", event.pageX + vis.config.tooltipPadding + "px")
           .style("top", event.pageY + vis.config.tooltipPadding + "px").html(`
             <div class="tooltip-title">${name}</div>
-            <ul>
-            <li>Log GDP per capita: ${ladder}</li>
-  
-          </ul>
+            Log GDP per capita: ${ladder}
             `);
       })
       .on("mouseleave", () => {
@@ -406,7 +478,7 @@ class ChoroplethMap {
       (d) => d.properties.healthyLife
     );
     let range = d3.extent(
-      vis.data,
+      vis.filteredData,
       (d) => d["Healthy life expectancy at birth"]
     );
     let min = range[0],
@@ -457,10 +529,7 @@ class ChoroplethMap {
           .style("left", event.pageX + vis.config.tooltipPadding + "px")
           .style("top", event.pageY + vis.config.tooltipPadding + "px").html(`
             <div class="tooltip-title">${name}</div>
-            <ul>
-            <li>Healthy life expectancy at birth: ${ladder}</li>
-  
-          </ul>
+            Healthy life expectancy at birth: ${ladder}
             `);
       })
       .on("mouseleave", () => {
@@ -498,7 +567,7 @@ class ChoroplethMap {
       vis.geoData.objects.world_countries.geometries,
       (d) => d.properties.free
     );
-    let range = d3.extent(vis.data, (d) => d["Freedom to make life choices"]);
+    let range = d3.extent(vis.filteredData, (d) => d["Freedom to make life choices"]);
     let min = range[0],
       max = range[1];
     vis.geoData.objects.world_countries.geometries.forEach((d) => {
@@ -545,10 +614,7 @@ class ChoroplethMap {
           .style("left", event.pageX + vis.config.tooltipPadding + "px")
           .style("top", event.pageY + vis.config.tooltipPadding + "px").html(`
             <div class="tooltip-title">${name}</div>
-            <ul>
-            <li>Freedom to make life choices: ${ladder}</li>
-  
-          </ul>
+            Freedom to make life choices: ${ladder}
             `);
       })
       .on("mouseleave", () => {
@@ -586,7 +652,7 @@ class ChoroplethMap {
       vis.geoData.objects.world_countries.geometries,
       (d) => d.properties.perceptions
     );
-    let range = d3.extent(vis.data, (d) => d["Perceptions of corruption"]);
+    let range = d3.extent(vis.filteredData, (d) => d["Perceptions of corruption"]);
     let min = range[0],
       max = range[1];
     vis.geoData.objects.world_countries.geometries.forEach((d) => {
@@ -638,10 +704,7 @@ class ChoroplethMap {
           .style("left", event.pageX + vis.config.tooltipPadding + "px")
           .style("top", event.pageY + vis.config.tooltipPadding + "px").html(`
             <div class="tooltip-title">${name}</div>
-            <ul>
-            <li>Perceptions of corruption: ${ladder}</li>
-  
-          </ul>
+            Perceptions of corruption: ${ladder}
             `);
       })
       .on("mouseleave", () => {
@@ -679,7 +742,7 @@ class ChoroplethMap {
       vis.geoData.objects.world_countries.geometries,
       (d) => d.properties.positive
     );
-    let range = d3.extent(vis.data, (d) => d["Positive affect"]);
+    let range = d3.extent(vis.filteredData, (d) => d["Positive affect"]);
     let min = range[0],
       max = range[1];
     vis.geoData.objects.world_countries.geometries.forEach((d) => {
@@ -726,10 +789,7 @@ class ChoroplethMap {
           .style("left", event.pageX + vis.config.tooltipPadding + "px")
           .style("top", event.pageY + vis.config.tooltipPadding + "px").html(`
             <div class="tooltip-title">${name}</div>
-            <ul>
-            <li>Positive affect: ${ladder}</li>
-  
-          </ul>
+            Positive affect: ${ladder}
             `);
       })
       .on("mouseleave", () => {
@@ -767,7 +827,7 @@ class ChoroplethMap {
       vis.geoData.objects.world_countries.geometries,
       (d) => d.properties.negative
     );
-    let range = d3.extent(vis.data, (d) => d["Negative affect"]);
+    let range = d3.extent(vis.filteredData, (d) => d["Negative affect"]);
     let min = range[0],
       max = range[1];
     vis.geoData.objects.world_countries.geometries.forEach((d) => {
@@ -814,10 +874,7 @@ class ChoroplethMap {
           .style("left", event.pageX + vis.config.tooltipPadding + "px")
           .style("top", event.pageY + vis.config.tooltipPadding + "px").html(`
             <div class="tooltip-title">${name}</div>
-            <ul>
-            <li>Negative affect: ${ladder}</li>
-  
-          </ul>
+            Negative affect: ${ladder}
             `);
       })
       .on("mouseleave", () => {
@@ -855,7 +912,7 @@ class ChoroplethMap {
       vis.geoData.objects.world_countries.geometries,
       (d) => d.properties.generosity
     );
-    let range = d3.extent(vis.data, (d) => d["Generosity"]);
+    let range = d3.extent(vis.filteredData, (d) => d["Generosity"]);
     let min = range[0],
       max = range[1];
     vis.geoData.objects.world_countries.geometries.forEach((d) => {
@@ -902,10 +959,7 @@ class ChoroplethMap {
           .style("left", event.pageX + vis.config.tooltipPadding + "px")
           .style("top", event.pageY + vis.config.tooltipPadding + "px").html(`
             <div class="tooltip-title">${name}</div>
-            <ul>
-            <li>Generosity: ${ladder}</li>
-  
-          </ul>
+            Generosity: ${ladder}
             `);
       })
       .on("mouseleave", () => {
