@@ -7,22 +7,22 @@ class SpiderChart {
    constructor(_config, _data) {
     this.config = {
       parentElement: _config.parentElement,
-      containerWidth: _config.containerWidth || 300,
+      containerWidth: _config.containerWidth || 470,
       containerHeight: _config.containerHeight || 300,
-      margin: _config.margin || {top: 25, right: 25, bottom: 25, left: 25},
+      margin: _config.margin || {top: 25, right: 110, bottom: 25, left: 110},
       tooltipPadding: _config.tooltipPadding || 15,
       levels: 5,
-      levelScale: 0.85,
+      // levelScale: 0.85,
       labelScale: 1.0,
-      facetPaddingScale: 2.5,
+      // facetPaddingScale: 2.5,
       maxValue: 1,
       radians: 2 * Math.PI,
       polygonAreaOpacity: 0.3,
       polygonStrokeOpacity: 1,
       polygonPointSize: 4,
       legendBoxSize: 10,
-      translateX: 350 / 5,
-      translateY: 350 / 5,
+      translateX: 350 / 3,
+      translateY: 350 / 8,
       paddingX: 350,
       paddingY: 350,
       colors: d3.scaleOrdinal(d3.schemeCategory10),
@@ -67,7 +67,7 @@ class SpiderChart {
     vis.allAxis = ["Social support", "Freedom to make life choices", 
     "Perceptions of corruption", "Positive affect", "Negative affect"];
     vis.totalAxes = vis.allAxis.length;
-    vis.radius = Math.min(vis.config.containerWidth / 2, vis.config.containerHeight / 2);
+    vis.radius = Math.min(vis.width / 2, vis.height / 2);
     console.log(vis.radius);
 
     // create verticesTooltip
@@ -118,6 +118,7 @@ class SpiderChart {
       if (vis.groups.indexOf(group) < 0 && record["Display"]) {
         vis.groups.push(group); // push to unique groups tracking
         vis.groupedData.push({ // push group node in data
+          lifeLadder: record["Life Ladder"],
           group: group,
           axes: []
         });
@@ -169,8 +170,6 @@ class SpiderChart {
         .attr("transform", "translate(" + (vis.width / 2 - levelFactor) + ", " + (vis.height / 2 - levelFactor) + ")")
         .attr("stroke", "gray")
         .attr("stroke-width", "0.5px");
-
-      console.log("thing: " + vis.radius);
     }
 
     // builds out the levels labels
@@ -232,9 +231,9 @@ class SpiderChart {
         .attr("cy", function(d, i) { return d.coordinates.y; })
         .attr("fill", vis.config.colors(g))
         .on("mouseover", (event,d) => {
-          let name = d["Country name"];
-          let ladder = d["Life ladder"] ? d["Life ladder"] : "N/A";
-          d3.select('#tooltip')
+          let name = d.group;
+          let ladder = d.socialSupport ? d.socialSupport : "N/A";
+          d3.select('#spider-tooltip')
             .style('display', 'block')
             .style('left', (event.pageX + vis.config.tooltipPadding) + 'px')   
             .style('top', (event.pageY + vis.config.tooltipPadding) + 'px')
@@ -270,16 +269,18 @@ class SpiderChart {
         d3.select(this) // focus on active polygon
         .transition(250)
           .attr("fill-opacity", 0.7)
-          .attr("stroke-opacity", vis.config.polygonStrokeOpacity);
-        let name = d["Country name"];
-        let ladder = d["Life ladder"] ? d["Life ladder"] : "N/A";
-        d3.select('#tooltip')
+      })
+      .on("mousemove", (event, d) => {
+        let name = d.group;
+        let ladder = d.lifeLadder ? d.lifeLadder : "N/A";
+        d3.select('#spider-tooltip')
+          .attr("fill-opacity", 1)
           .style('display', 'block')
           .style('left', (event.pageX + vis.config.tooltipPadding) + 'px')   
           .style('top', (event.pageY + vis.config.tooltipPadding) + 'px')
           .html(`
             <div class="tooltip-title">${name}</div>
-            <div>${ladder}</div>
+            <div>Life Ladder: ${ladder}</div>
             `);
       })
       .on("mouseleave", function() {
@@ -287,6 +288,7 @@ class SpiderChart {
           .transition(250)
           .attr("fill-opacity", vis.config.polygonAreaOpacity)
           .attr("stroke-opacity", 1);
+        d3.select("#spider-tooltip").style("display", "none");
       });
 
     // builds out the legend
