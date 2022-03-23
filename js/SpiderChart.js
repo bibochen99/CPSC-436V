@@ -4,7 +4,7 @@ class SpiderChart {
    * @param {Object}
    * @param {Array}
    */
-   constructor(_config, _data) {
+   constructor(_config, _data, _dispatcher) {
     this.config = {
       parentElement: _config.parentElement,
       containerWidth: _config.containerWidth || 470,
@@ -34,8 +34,7 @@ class SpiderChart {
       showVertices: true,
       showPolygons: true
     }
-
-    // this.dispatcher = _dispatcher;
+    this.dispatcher = _dispatcher;
     this.data = _data;
     this.initVis();
   }
@@ -243,7 +242,7 @@ class SpiderChart {
             `);
         })
         .on("mouseleave", () => {
-          d3.select('#tooltip').style('display', 'none');
+          d3.select('#spider-tooltip').style('display', 'none');
         });
     });
 

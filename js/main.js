@@ -1,3 +1,5 @@
+const dispatcher = d3.dispatch("timeline", "selectMap", "selectScatter", "selectSpider");
+
 /**
  * Load and combine data
  */
@@ -35,24 +37,24 @@ Promise.all([
 
   // Combine both datasets to the TopoJSON file
   let inputYear = 2013;
-  geoData.objects.world_countries.geometries.forEach((d) => {
-    for (let i = 0; i < data.length; i++) {
-      if (d.properties.name == data[i]["Country name"]) {
-        if (data[i].year === inputYear) {
-          d.properties.year = inputYear;
-          d.properties.lifeLadder = data[i]["Life Ladder"];
-          d.properties.socialSupport = data[i]["Social support"];
-          d.properties.gdp = data[i]["Log GDP per capita"];
-          d.properties.healthyLife = data[i]["Healthy life expectancy at birth"];
-          d.properties.free = data[i]["Freedom to make life choices"];
-          d.properties.perceptions = data[i]["Perceptions of corruption"];
-          d.properties.positive = data[i]["Positive affect"];
-          d.properties.negative = data[i]["Negative affect"];
-          d.properties.generosity = data[i]["Generosity"];
-        }
-      }
-    }
-  });
+  // geoData.objects.world_countries.geometries.forEach((d) => {
+  //   for (let i = 0; i < data.length; i++) {
+  //     if (d.properties.name == data[i]["Country name"]) {
+  //       // if (data[i].year === inputYear) {
+  //         d.properties.year = data[i]["year"];
+  //         d.properties.lifeLadder = data[i]["Life Ladder"];
+  //         d.properties.socialSupport = data[i]["Social support"];
+  //         d.properties.gdp = data[i]["Log GDP per capita"];
+  //         d.properties.healthyLife = data[i]["Healthy life expectancy at birth"];
+  //         d.properties.free = data[i]["Freedom to make life choices"];
+  //         d.properties.perceptions = data[i]["Perceptions of corruption"];
+  //         d.properties.positive = data[i]["Positive affect"];
+  //         d.properties.negative = data[i]["Negative affect"];
+  //         d.properties.generosity = data[i]["Generosity"];
+  //       // }
+  //     }
+  //   }
+  // });
 
   let entryData = data.filter((d) => {
     return d.year == 2013;
@@ -74,7 +76,8 @@ Promise.all([
       parentElement: "#map",
     },
     geoData,
-    entryData
+    data,
+    dispatcher
   );
 
   // Create a waypoint for each `step` container
@@ -99,6 +102,7 @@ Promise.all([
     {
       parentElement: "#spider",
     },
-    entryData
+    entryData,
+    dispatcher
   );
 });

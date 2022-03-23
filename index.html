@@ -5,12 +5,15 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans" rel="stylesheet"> 
   </head>
   <body>
     <div class="container">
       <div id="map"></div>
       <div id="map-tooltip"></div>
+      <div id="slider">
+        <div id="year-slider"></div>
+      </div>
       <div id="prose">
         <div class="step" id="step0">Life Ladders</div>
         <div class="step" id="step1">Social Support</div>
@@ -29,6 +32,7 @@
 
 
     <script src="js/d3.v6.min.js"></script>
+    <script src="https://unpkg.com/d3-simple-slider"></script>
     <script src="js/topojson.v3.js"></script>
     <script src="js/noframework.waypoints.min.js"></script>
     <script src="js/main.js"></script>
