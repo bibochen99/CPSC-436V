@@ -80,6 +80,16 @@ Promise.all([
     dispatcher
   );
 
+  scatterplot = new Scatterplot(
+    {
+      parentElement: "#scatterplot",
+    },
+    entryData
+  );
+  scatterplot.updateVis();
+
+
+
   // Create a waypoint for each `step` container
   const waypoints = d3.selectAll(".step").each(function (d, stepIndex) {
     return new Waypoint({
