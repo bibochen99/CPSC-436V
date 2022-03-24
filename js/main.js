@@ -1,7 +1,9 @@
+const dispatcher = d3.dispatch("timeline", "selectMap", "selectScatter", "selectSpider");
+
 /**
  * Load and combine data
  */
-let geoData, data, lanLonData, choroplethMap;
+let geoData, data, lanLonData, choroplethMap, spiderChart;
 Promise.all([
   d3.json("data/world_countries_topo.json"),
   d3.csv("data/world-happiness-report.csv"),
@@ -22,6 +24,7 @@ Promise.all([
     d["Perceptions of corruption"] = +d["Perceptions of corruption"];
     d["Positive affect"] = +d["Positive affect"];
     d["Negative affect"] = +d["Negative affect"];
+    d.Display = false;
     lanLonData.forEach((data) => {
       if (d["Country name"] == data["country"]) d["lat"] = data["latitude"];
       d["lon"] = data["longitude"];
@@ -34,27 +37,37 @@ Promise.all([
 
   // Combine both datasets to the TopoJSON file
   let inputYear = 2013;
-  geoData.objects.world_countries.geometries.forEach((d) => {
-    for (let i = 0; i < data.length; i++) {
-      if (d.properties.name == data[i]["Country name"]) {
-        if (data[i].year === inputYear) {
-          d.properties.year = inputYear;
-          d.properties.lifeLadder = data[i]["Life Ladder"];
-          d.properties.socialSupport = data[i]["Social support"];
-          d.properties.gdp = data[i]["Log GDP per capita"];
-          d.properties.healthyLife = data[i]["Healthy life expectancy at birth"];
-          d.properties.free = data[i]["Freedom to make life choices"];
-          d.properties.perceptions = data[i]["Perceptions of corruption"];
-          d.properties.positive = data[i]["Positive affect"];
-          d.properties.negative = data[i]["Negative affect"];
-          d.properties.generosity = data[i]["Generosity"];
-        }
-      }
-    }
-  });
+  // geoData.objects.world_countries.geometries.forEach((d) => {
+  //   for (let i = 0; i < data.length; i++) {
+  //     if (d.properties.name == data[i]["Country name"]) {
+  //       // if (data[i].year === inputYear) {
+  //         d.properties.year = data[i]["year"];
+  //         d.properties.lifeLadder = data[i]["Life Ladder"];
+  //         d.properties.socialSupport = data[i]["Social support"];
+  //         d.properties.gdp = data[i]["Log GDP per capita"];
+  //         d.properties.healthyLife = data[i]["Healthy life expectancy at birth"];
+  //         d.properties.free = data[i]["Freedom to make life choices"];
+  //         d.properties.perceptions = data[i]["Perceptions of corruption"];
+  //         d.properties.positive = data[i]["Positive affect"];
+  //         d.properties.negative = data[i]["Negative affect"];
+  //         d.properties.generosity = data[i]["Generosity"];
+  //       // }
+  //     }
+  //   }
+  // });
 
   let entryData = data.filter((d) => {
     return d.year == 2013;
+  });
+
+  let range = d3.extent(entryData, (d) => d["Life Ladder"]);
+  let min = range[0],
+    max = range[1];
+  
+  entryData.forEach((d) => {
+    if (d["Life Ladder"] == max || d["Life Ladder"] == min) {
+      d.Display = true;
+    }
   });
 
   // choroplethMap init
@@ -63,7 +76,8 @@ Promise.all([
       parentElement: "#map",
     },
     geoData,
-    entryData
+    data,
+    dispatcher
   );
 
   scatterplot = new Scatterplot(
@@ -93,4 +107,12 @@ Promise.all([
       offset: "50%",
     });
   });
+
+  spiderChart = new SpiderChart(
+    {
+      parentElement: "#spider",
+    },
+    entryData,
+    dispatcher
+  );
 });
