@@ -21,7 +21,7 @@ body {
   overflow-y: scroll;
 }
 #prose {
-  margin-left: 80%;
+  margin-left: 95%;
 }
 #prose .step {
   height: 500px;
@@ -66,10 +66,15 @@ body {
 .scatterplot {
   position: absolute;
   margin-right: 30px;
-  margin-top: 350px;
+  margin-top: 28%;
 }
 
 #scatterplot-tooltip {
+  position: absolute;
+  display: none;
+  background: #fff;
+  box-shadow: 3px 3px 3px 0px rgb(92 92 92 / 0.5);
+  border: 1px solid #ddd;
   font-size: 12px;
   font-weight: 500;
   padding: 8px;
@@ -109,9 +114,8 @@ body {
   position: fixed;
   display: block;
   top: 55%;
-  left: 30%;
+  left: 50%;
 }
-
 
 #spider-tooltip {
   position: absolute;
@@ -124,6 +128,13 @@ body {
   padding: 10px;
   color: #333;
   z-index:100;
+}
+
+#smiley {
+  position: fixed;
+  display: block;
+  top: 55%;
+  left: 55%;
 }
 
 footer a,
@@ -166,6 +177,11 @@ pre {
 }
 .checkbox {
   margin-left: 20px;
+}
+
+.scatter-plot.selected{
+  stroke: orange;
+  stroke-width: 3;
 }
 /* Customizable classes used in D3 vis, uncomment to customize
 .svg-vis {
@@ -213,6 +229,3 @@ pre {
   font-size: 15px;
 }
 */
-
-
-
