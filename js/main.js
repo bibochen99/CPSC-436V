@@ -3,7 +3,7 @@ const dispatcher = d3.dispatch("timeline", "selectMap", "selectScatter", "select
 /**
  * Load and combine data
  */
-let geoData, data, lanLonData, choroplethMap, spiderChart;
+let geoData, data, lanLonData, choroplethMap, spiderChart, smiley;
 Promise.all([
   d3.json("data/world_countries_topo.json"),
   d3.csv("data/world-happiness-report.csv"),
@@ -65,6 +65,7 @@ Promise.all([
     max = range[1];
   
   entryData.forEach((d) => {
+    d.select = false;
     if (d["Life Ladder"] == max || d["Life Ladder"] == min) {
       d.Display = true;
     }
@@ -87,7 +88,6 @@ Promise.all([
     entryData
   );
   scatterplot.updateVis();
-
 
 
   // Create a waypoint for each `step` container
@@ -114,5 +114,12 @@ Promise.all([
     },
     entryData,
     dispatcher
+  );
+
+  smiley = new Smileyface(
+    {
+      parentElement: "#smiley",
+    },
+    20, 20
   );
 });

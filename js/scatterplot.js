@@ -107,13 +107,22 @@ class Scatterplot {
 
 
       // Add circles
-      const circles = vis.chart.selectAll('.point')
+      const circles = vis.chart.selectAll('.scatter-plot')
           .data(vis.data)
         .join('circle')
-          .attr('class', 'point')
+          .attr('class', 'scatter-plot')
           .attr('r', 4)
           .attr('cy', d => vis.yScale(vis.yValue(d)))
           .attr('cx', d => vis.xScale(vis.xValue(d)))
+          .attr('stroke','blue')
+          .attr('fill','lightblue')
+          .classed("selected", d => {
+            if(d.select == true){
+              return true;
+            }else{
+              return false;
+            }
+          });
   
       // Tooltip event listeners
       circles
@@ -128,6 +137,16 @@ class Scatterplot {
                   <li>Life Ladder: ${d["Life Ladder"]} </li>
                 </ul>
               `);
+          })
+          .on('click', function(event, d) {
+            if (!d.select) {
+              d3.select(this).classed('selected', true);
+              d.select = true;
+            } else {
+              d3.select(this).classed('selected', false);
+              d.select = false;
+            }
+            //vis.dispatcher.call('selectedCountry', event);
           })
           .on('mouseleave', () => {
             d3.select('#scatterplot-tooltip').style('display', 'none');
