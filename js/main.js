@@ -116,3 +116,38 @@ Promise.all([
     dispatcher
   );
 });
+
+/**
+ * Dispatcher waits for 'selectMap' event
+ *  filter data based on the selected categories and update the plot
+ */
+// TODO: selectedCategories contain country name, and will only have up to 5 country names, Ex. ["Russia","China"]
+dispatcher.on("selectMap", (selectedCategories) => {
+  /**
+   * A sample how to modifies the dataset
+   */
+
+  // if (selectedCategories.length !== 0) {
+  //   let selected = selectedCategories[0];
+  //   data.forEach((d) => {
+  //     if (d.gender === selected) {
+  //       d.showup = 1;
+  //       d.barclicked = 1;
+  //     } else {
+  //       d.showup = 0;
+  //       d.barclicked = 0;
+  //     }
+  //   });
+  // } else {
+  //   data.forEach((d) => {
+  //     d.showup = 1;
+  //     d.idup = 0;
+  //     d.arrowup = 0;
+  //     d.barclicked = 0;
+  //   });
+  //}
+  // update other vis
+
+  // scatterplot.updateVis();
+  // lexisplot.updateVis();
+});
