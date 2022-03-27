@@ -71,6 +71,19 @@ Promise.all([
     }
   });
 
+  // add groups to the scatterplot's dropdown filter
+  d3.select("#filterScatter")
+      .selectAll('myOptions')
+     	.data(["Log GDP per capita", "Social support",
+       "Healthy life expectancy at birth", "Freedom to make life choices",
+       "Generosity", "Perceptions of corruption",
+       "Positive affect", "Negative affect"])
+      .enter()
+    	.append('option')
+      .text(function (d) { return d; }) // text showed in the menu
+      .attr("value", function (d) { return d; })
+      .property("selected", function(d){ return d === "Social support"; });
+
   // choroplethMap init
   choroplethMap = new ChoroplethMap(
     {
@@ -86,7 +99,8 @@ Promise.all([
     {
       parentElement: "#scatterplot",
     },
-    entryData
+    entryData,
+    "Social support"
   );
   scatterplot.updateVis();
 
@@ -124,6 +138,13 @@ Promise.all([
     },
     20, 20
   );
+});
+
+d3.select("#filterScatter").on("change", function(d) {
+  // recover the option that has been chosen
+  let selectedOption = d3.select(this).property("value");
+  scatterplot.xAttr = selectedOption;
+  scatterplot.updateVis();
 });
 
 dispatcher.on("timeline", selectedYear => {

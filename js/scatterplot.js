@@ -5,15 +5,16 @@ class Scatterplot {
      * @param {Object}
      * @param {Array}
      */
-    constructor(_config, _data) {
+    constructor(_config, _data, _xAttr) {
       this.config = {
         parentElement: _config.parentElement,
-        containerWidth: _config.containerWidth || 500,
-        containerHeight: _config.containerHeight || 300,
+        containerWidth: _config.containerWidth || 400,
+        containerHeight: _config.containerHeight || 240,
         margin: _config.margin || {top: 25, right: 20, bottom: 20, left: 35},
         tooltipPadding: _config.tooltipPadding || 15
       }
       this.data = _data;
+      this.xAttr = _xAttr;
       this.initVis();
     }
     
@@ -67,13 +68,13 @@ class Scatterplot {
           .attr('class', 'axis y-axis');
   
       // Append both axis titles
-      vis.chart.append('text')
+      vis.xLabel = vis.chart.append('text')
           .attr('class', 'axis-title')
           .attr('y', vis.height - 15)
           .attr('x', vis.width + 10)
           .attr('dy', '.71em')
           .style('text-anchor', 'end')
-          .text('Social Support');
+          .text(vis.xAttr);
   
       vis.svg.append('text')
           .attr('class', 'axis-title')
@@ -89,12 +90,14 @@ class Scatterplot {
     updateVis() {
       let vis = this;
       // Specificy accessor functions
-      vis.xValue = d => d["Social support"];
+      vis.xValue = d => d[vis.xAttr];
       vis.yValue = d => d["Life Ladder"];
   
       // Set the scale input domains
       vis.xScale.domain([0, d3.max(vis.data, vis.xValue)]);
       vis.yScale.domain([0, d3.max(vis.data, vis.yValue)]);
+
+      vis.xLabel.text(vis.xAttr);
   
       vis.renderVis();
     }
@@ -104,7 +107,6 @@ class Scatterplot {
      */
     renderVis() {
       let vis = this;
-
 
       // Add circles
       const circles = vis.chart.selectAll('.scatter-plot')

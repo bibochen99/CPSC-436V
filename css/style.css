@@ -63,10 +63,16 @@ body {
   padding-left: 20px;
 }
 
+#filterScatter {
+  position: fixed;
+  width: 300px;
+  margin-top: 27%;
+}
+
 .scatterplot {
   position: absolute;
   margin-right: 30px;
-  margin-top: 28%;
+  margin-top: 30%;
 }
 
 #scatterplot-tooltip {
