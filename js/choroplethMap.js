@@ -115,7 +115,7 @@ class ChoroplethMap {
 
     // Time slider
     // source: https://bl.ocks.org/johnwalley/e1d256b81e51da68f7feb632a53c3518
-    vis.dataTime = d3.range(0, 16).map(function(d) {
+    vis.dataTime = d3.range(0, 16).map(function (d) {
       return new Date(2005 + d, 1, 1);
     });
 
@@ -125,50 +125,51 @@ class ChoroplethMap {
       .max(d3.max(vis.dataTime))
       .step(1000 * 60 * 60 * 24 * 365)
       .width(500)
-      .tickFormat(d3.timeFormat('%Y'))
+      .tickFormat(d3.timeFormat("%Y"))
       .tickValues(vis.dataTime)
       .default(new Date(2013, 1, 1))
-      .on('onchange', val => {
-        d3.select('p#value-time').text(d3.timeFormat('%Y')(val));
-        vis.config.currYear = d3.timeFormat('%Y')(val);
+      .on("onchange", (val) => {
+        d3.select("p#value-time").text(d3.timeFormat("%Y")(val));
+        vis.config.currYear = d3.timeFormat("%Y")(val);
         vis.step0();
       });
-    
-    d3.select('div#year-slider')
-      .append('svg')
-      .attr('width', 550)
-      .attr('height', 100)
-      .append('g')
-      .attr('transform', 'translate(30,30)')
+
+    d3.select("div#year-slider")
+      .append("svg")
+      .attr("width", 550)
+      .attr("height", 100)
+      .append("g")
+      .attr("transform", "translate(30,30)")
       .call(vis.yearSlider);
-    
+
     // d3.select('p#value-time').text(d3.timeFormat('%Y')(vis.yearSlider.value()));
 
     vis.step0();
   }
 
-  filterGeoData(inputYear) {
-    let vis = this;
-    // vis.geoData.objects.world_countries.geometries = {};
-    vis.geoData.objects.world_countries.geometries.forEach((d) => {
-      for (let i = 0; i < vis.data.length; i++) {
-        if (d.properties.name == vis.data[i]["Country name"]) {
-          if (vis.data[i].year === inputYear) {
-            d.properties.year = vis.data[i]["year"];
-            d.properties.lifeLadder = vis.data[i]["Life Ladder"];
-            d.properties.socialSupport = vis.data[i]["Social support"];
-            d.properties.gdp = vis.data[i]["Log GDP per capita"];
-            d.properties.healthyLife = vis.data[i]["Healthy life expectancy at birth"];
-            d.properties.free = vis.data[i]["Freedom to make life choices"];
-            d.properties.perceptions = vis.data[i]["Perceptions of corruption"];
-            d.properties.positive = vis.data[i]["Positive affect"];
-            d.properties.negative = vis.data[i]["Negative affect"];
-            d.properties.generosity = vis.data[i]["Generosity"];
-          }
-        }
-      }
-    });
-  }
+  // filterGeoData(inputYear) {
+  //   let vis = this;
+  //   // vis.geoData.objects.world_countries.geometries = {};
+  //   vis.geoData.objects.world_countries.geometries.forEach((d) => {
+  //     for (let i = 0; i < vis.data.length; i++) {
+  //       if (d.properties.name == vis.data[i]["Country name"]) {
+  //         if (vis.data[i].year === inputYear) {
+  //           d.properties.year = vis.data[i]["year"];
+  //           d.properties.lifeLadder = vis.data[i]["Life Ladder"];
+  //           d.properties.socialSupport = vis.data[i]["Social support"];
+  //           d.properties.gdp = vis.data[i]["Log GDP per capita"];
+  //           d.properties.healthyLife =
+  //             vis.data[i]["Healthy life expectancy at birth"];
+  //           d.properties.free = vis.data[i]["Freedom to make life choices"];
+  //           d.properties.perceptions = vis.data[i]["Perceptions of corruption"];
+  //           d.properties.positive = vis.data[i]["Positive affect"];
+  //           d.properties.negative = vis.data[i]["Negative affect"];
+  //           d.properties.generosity = vis.data[i]["Generosity"];
+  //         }
+  //       }
+  //     }
+  //   });
+  // }
 
   step0() {
     let vis = this;
@@ -188,16 +189,19 @@ class ChoroplethMap {
       for (let i = 0; i < vis.filteredData.length; i++) {
         if (d.properties.name == vis.filteredData[i]["Country name"]) {
           // if (vis.data[i].year === inputYear) {
-            d.properties.year = vis.filteredData[i]["year"];
-            d.properties.lifeLadder = vis.filteredData[i]["Life Ladder"];
-            d.properties.socialSupport = vis.filteredData[i]["Social support"];
-            d.properties.gdp = vis.filteredData[i]["Log GDP per capita"];
-            d.properties.healthyLife = vis.filteredData[i]["Healthy life expectancy at birth"];
-            d.properties.free = vis.filteredData[i]["Freedom to make life choices"];
-            d.properties.perceptions = vis.filteredData[i]["Perceptions of corruption"];
-            d.properties.positive = vis.filteredData[i]["Positive affect"];
-            d.properties.negative = vis.filteredData[i]["Negative affect"];
-            d.properties.generosity = vis.filteredData[i]["Generosity"];
+          d.properties.year = vis.filteredData[i]["year"];
+          d.properties.lifeLadder = vis.filteredData[i]["Life Ladder"];
+          d.properties.socialSupport = vis.filteredData[i]["Social support"];
+          d.properties.gdp = vis.filteredData[i]["Log GDP per capita"];
+          d.properties.healthyLife =
+            vis.filteredData[i]["Healthy life expectancy at birth"];
+          d.properties.free =
+            vis.filteredData[i]["Freedom to make life choices"];
+          d.properties.perceptions =
+            vis.filteredData[i]["Perceptions of corruption"];
+          d.properties.positive = vis.filteredData[i]["Positive affect"];
+          d.properties.negative = vis.filteredData[i]["Negative affect"];
+          d.properties.generosity = vis.filteredData[i]["Generosity"];
           // }
         }
       }
@@ -208,14 +212,16 @@ class ChoroplethMap {
       (d) => d.properties.lifeLadder
     );
 
-    console.log(vis.mapValue);
-
     let range = d3.extent(vis.filteredData, (d) => d["Life Ladder"]);
+
     let min = range[0],
       max = range[1];
 
     vis.geoData.objects.world_countries.geometries.forEach((d) => {
-      if (d.properties.lifeLadder == max && d.properties.year == vis.config.currYear) {
+      if (
+        d.properties.lifeLadder == max &&
+        d.properties.year == vis.config.currYear
+      ) {
         d.properties.isMax = 1;
       } else if (d.properties.lifeLadder == min) {
         d.properties.isMin = 1;
@@ -233,16 +239,11 @@ class ChoroplethMap {
       { color: "#0d306b", value: max, offset: 100 },
     ];
 
-    vis.renderVis();
-  }
-
-  renderVis() {
-    let vis = this;
-
     // Append world map
     vis.geoJoinPath
       .transition()
       .attr("class", "geo-path")
+      .attr("id", (d) => d.properties.name)
       .attr("d", vis.geoPath)
       .attr("fill", (d) => {
         if (d.properties.isMax == 1) {
@@ -294,6 +295,33 @@ class ChoroplethMap {
       .attr("offset", (d) => d.offset)
       .attr("stop-color", (d) => d.color);
     vis.legendRect.attr("fill", "url(#legend-gradient)");
+
+    // console.log(vis.geoData);
+
+    // on click event and dispatcher
+    let selectedCategories = [];
+
+    vis.geoJoinPath.on("click", function (event, d) {
+      // Check if current category is active and toggle class
+
+      const isActive = d3.select(this).classed("active");
+
+      d3.select(this).classed("active", !isActive);
+      if (selectedCategories.length < 5) {
+        selectedCategories.push(this.id);
+      }
+      // console.log(selectedCategories);
+      // if (!selectedCategories.includes(this.id)) {
+      //   selectedCategories.push(this.id);
+      // } else {
+      //   selectedCategories = selectedCategories.filter((d) => {
+      //     return d !== this.id;
+      //   });
+      // }
+
+      // // Trigger filter event and pass array with the selected category names
+      vis.dispatcher.call("selectMap", event, selectedCategories);
+    });
   }
 
   step1() {
@@ -313,7 +341,10 @@ class ChoroplethMap {
     });
 
     vis.geoData.objects.world_countries.geometries.forEach((d) => {
-      if (d.properties.socialSupport == max && d.properties.year == vis.config.currYear) {
+      if (
+        d.properties.socialSupport == max &&
+        d.properties.year == vis.config.currYear
+      ) {
         d.properties.isMax = 1;
       } else if (d.properties.socialSupport == min) {
         d.properties.isMin = 1;
@@ -567,7 +598,10 @@ class ChoroplethMap {
       vis.geoData.objects.world_countries.geometries,
       (d) => d.properties.free
     );
-    let range = d3.extent(vis.filteredData, (d) => d["Freedom to make life choices"]);
+    let range = d3.extent(
+      vis.filteredData,
+      (d) => d["Freedom to make life choices"]
+    );
     let min = range[0],
       max = range[1];
     vis.geoData.objects.world_countries.geometries.forEach((d) => {
@@ -652,7 +686,10 @@ class ChoroplethMap {
       vis.geoData.objects.world_countries.geometries,
       (d) => d.properties.perceptions
     );
-    let range = d3.extent(vis.filteredData, (d) => d["Perceptions of corruption"]);
+    let range = d3.extent(
+      vis.filteredData,
+      (d) => d["Perceptions of corruption"]
+    );
     let min = range[0],
       max = range[1];
     vis.geoData.objects.world_countries.geometries.forEach((d) => {
