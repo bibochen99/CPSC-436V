@@ -3,7 +3,7 @@ const dispatcher = d3.dispatch("timeline", "selectMap", "selectScatter", "select
 /**
  * Load and combine data
  */
-let geoData, data, lanLonData, choroplethMap, spiderChart;
+let geoData, data, filteredData, lanLonData, choroplethMap, spiderChart;
 Promise.all([
   d3.json("data/world_countries_topo.json"),
   d3.csv("data/world-happiness-report.csv"),
@@ -77,7 +77,8 @@ Promise.all([
     },
     geoData,
     data,
-    dispatcher
+    dispatcher,
+    2013
   );
 
   scatterplot = new Scatterplot(
@@ -112,7 +113,16 @@ Promise.all([
     {
       parentElement: "#spider",
     },
-    entryData,
-    dispatcher
+    data,
+    dispatcher,
+    2013
   );
+});
+
+dispatcher.on("timeline", selectedYear => {
+  console.log("year: " + selectedYear);
+  choroplethMap.currYear = selectedYear;
+  choroplethMap.step0();
+  spiderChart.currYear = selectedYear;
+  spiderChart.updateVis();
 });

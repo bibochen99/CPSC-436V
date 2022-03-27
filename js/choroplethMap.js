@@ -4,7 +4,7 @@ class ChoroplethMap {
    * @param {Object}
    * @param {Array}
    */
-  constructor(_config, _geoData, _data, _dispatcher) {
+  constructor(_config, _geoData, _data, _dispatcher, _currYear) {
     this.config = {
       parentElement: _config.parentElement,
       containerWidth: _config.containerWidth || 800,
@@ -30,7 +30,8 @@ class ChoroplethMap {
     };
     this.geoData = _geoData;
     this.data = _data;
-    this._dispatcher = _dispatcher;
+    this.dispatcher = _dispatcher;
+    this.currYear = _currYear;
     this.initVis();
   }
 
@@ -129,9 +130,11 @@ class ChoroplethMap {
       .tickValues(vis.dataTime)
       .default(new Date(2013, 1, 1))
       .on('onchange', val => {
+        let selectedYear = d3.timeFormat('%Y')(val);
         d3.select('p#value-time').text(d3.timeFormat('%Y')(val));
-        vis.config.currYear = d3.timeFormat('%Y')(val);
-        vis.step0();
+        // vis.config.currYear = selectedYear;
+        // vis.step0();
+        vis.dispatcher.call("timeline", event, selectedYear);
       });
     
     d3.select('div#year-slider')
@@ -147,29 +150,6 @@ class ChoroplethMap {
     vis.step0();
   }
 
-  filterGeoData(inputYear) {
-    let vis = this;
-    // vis.geoData.objects.world_countries.geometries = {};
-    vis.geoData.objects.world_countries.geometries.forEach((d) => {
-      for (let i = 0; i < vis.data.length; i++) {
-        if (d.properties.name == vis.data[i]["Country name"]) {
-          if (vis.data[i].year === inputYear) {
-            d.properties.year = vis.data[i]["year"];
-            d.properties.lifeLadder = vis.data[i]["Life Ladder"];
-            d.properties.socialSupport = vis.data[i]["Social support"];
-            d.properties.gdp = vis.data[i]["Log GDP per capita"];
-            d.properties.healthyLife = vis.data[i]["Healthy life expectancy at birth"];
-            d.properties.free = vis.data[i]["Freedom to make life choices"];
-            d.properties.perceptions = vis.data[i]["Perceptions of corruption"];
-            d.properties.positive = vis.data[i]["Positive affect"];
-            d.properties.negative = vis.data[i]["Negative affect"];
-            d.properties.generosity = vis.data[i]["Generosity"];
-          }
-        }
-      }
-    });
-  }
-
   step0() {
     let vis = this;
 
@@ -181,7 +161,7 @@ class ChoroplethMap {
     vis.legendTitle.text("Life Ladder");
 
     vis.filteredData = vis.data.filter((d) => {
-      return d.year == vis.config.currYear;
+      return d.year == vis.currYear;
     });
 
     vis.geoData.objects.world_countries.geometries.forEach((d) => {
@@ -215,7 +195,7 @@ class ChoroplethMap {
       max = range[1];
 
     vis.geoData.objects.world_countries.geometries.forEach((d) => {
-      if (d.properties.lifeLadder == max && d.properties.year == vis.config.currYear) {
+      if (d.properties.lifeLadder == max && d.properties.year == vis.currYear) {
         d.properties.isMax = 1;
       } else if (d.properties.lifeLadder == min) {
         d.properties.isMin = 1;
@@ -313,7 +293,7 @@ class ChoroplethMap {
     });
 
     vis.geoData.objects.world_countries.geometries.forEach((d) => {
-      if (d.properties.socialSupport == max && d.properties.year == vis.config.currYear) {
+      if (d.properties.socialSupport == max && d.properties.year == vis.currYear) {
         d.properties.isMax = 1;
       } else if (d.properties.socialSupport == min) {
         d.properties.isMin = 1;
@@ -443,7 +423,7 @@ class ChoroplethMap {
             `);
       })
       .on("mouseleave", () => {
-        d3.select("#tooltip").style("display", "none");
+        d3.select("#map-tooltip").style("display", "none");
       });
     // Add legend labels
     vis.legend
@@ -533,7 +513,7 @@ class ChoroplethMap {
             `);
       })
       .on("mouseleave", () => {
-        d3.select("#tooltip").style("display", "none");
+        d3.select("#map-tooltip").style("display", "none");
       });
     // Add legend labels
     vis.legend
@@ -618,7 +598,7 @@ class ChoroplethMap {
             `);
       })
       .on("mouseleave", () => {
-        d3.select("#tooltip").style("display", "none");
+        d3.select("#map-tooltip").style("display", "none");
       });
     // Add legend labels
     vis.legend
@@ -708,7 +688,7 @@ class ChoroplethMap {
             `);
       })
       .on("mouseleave", () => {
-        d3.select("#tooltip").style("display", "none");
+        d3.select("#map-tooltip").style("display", "none");
       });
     // Add legend labels
     vis.legend
@@ -793,7 +773,7 @@ class ChoroplethMap {
             `);
       })
       .on("mouseleave", () => {
-        d3.select("#tooltip").style("display", "none");
+        d3.select("#map-tooltip").style("display", "none");
       });
     // Add legend labels
     vis.legend
@@ -878,7 +858,7 @@ class ChoroplethMap {
             `);
       })
       .on("mouseleave", () => {
-        d3.select("#tooltip").style("display", "none");
+        d3.select("#map-tooltip").style("display", "none");
       });
     // Add legend labels
     vis.legend
@@ -963,7 +943,7 @@ class ChoroplethMap {
             `);
       })
       .on("mouseleave", () => {
-        d3.select("#tooltip").style("display", "none");
+        d3.select("#map-tooltip").style("display", "none");
       });
     // Add legend labels
     vis.legend
