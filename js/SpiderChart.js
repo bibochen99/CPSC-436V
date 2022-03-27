@@ -4,7 +4,7 @@ class SpiderChart {
    * @param {Object}
    * @param {Array}
    */
-   constructor(_config, _data, _dispatcher) {
+   constructor(_config, _data, _dispatcher, _currYear) {
     this.config = {
       parentElement: _config.parentElement,
       containerWidth: _config.containerWidth || 470,
@@ -36,6 +36,7 @@ class SpiderChart {
     }
     this.dispatcher = _dispatcher;
     this.data = _data;
+    this.currYear = _currYear;
     this.initVis();
   }
   
@@ -46,6 +47,8 @@ class SpiderChart {
     // Calculate inner chart size. Margin specifies the space around the actual chart.
     vis.width = vis.config.containerWidth - vis.config.margin.left - vis.config.margin.right;
     vis.height = vis.config.containerHeight - vis.config.margin.top - vis.config.margin.bottom;
+
+    d3.select(vis.config.parentElement).selectAll("svg").remove();
 
     // create main vis svg
     vis.svg = d3.select(vis.config.parentElement)
@@ -110,9 +113,16 @@ class SpiderChart {
   updateVis() {
     let vis = this;
 
+    vis.filterYear = vis.data.filter((d) => d.year == vis.currYear);
+    vis.filterYear.forEach((d) => {
+      if (d.Display) {
+        console.log(d);
+      }
+    });
+
     vis.groupedData = [];
     vis.groups = [];
-    vis.data.forEach(function(record) {
+    vis.filterYear.forEach(function(record) {
       let group = record["Country name"];
       if (vis.groups.indexOf(group) < 0 && record["Display"]) {
         vis.groups.push(group); // push to unique groups tracking
@@ -160,8 +170,9 @@ class SpiderChart {
 
       // build level-lines
       vis.levels
-        .data(vis.allAxis).enter()
-        .append("svg:line").classed("level-lines", true)
+        .data(vis.allAxis)
+        // .enter()
+        .join("svg:line").classed("level-lines", true)
         .attr("x1", function(d, i) { return levelFactor * (1 - Math.sin(i * vis.config.radians / vis.totalAxes)); })
         .attr("y1", function(d, i) { return levelFactor * (1 - Math.cos(i * vis.config.radians / vis.totalAxes)); })
         .attr("x2", function(d, i) { return levelFactor * (1 - Math.sin((i + 1) * vis.config.radians / vis.totalAxes)); })
@@ -177,8 +188,9 @@ class SpiderChart {
 
       // build level-labels
       vis.levels
-        .data([1]).enter()
-        .append("svg:text").classed("level-labels", true)
+        .data([1])
+        // .enter()
+        .join("svg:text").classed("level-labels", true)
         .text((vis.config.maxValue * (level + 1) / vis.config.levels).toFixed(2))
         .attr("x", function(d) { return levelFactor * (1 - Math.sin(0)); })
         .attr("y", function(d) { return levelFactor * (1 - Math.cos(0)); })
@@ -190,8 +202,9 @@ class SpiderChart {
 
     // builds out the axes
     vis.axes
-      .data(vis.allAxis).enter()
-      .append("svg:line").classed("axis-lines", true)
+      .data(vis.allAxis)
+      // .enter()
+      .join("svg:line").classed("axis-lines", true)
       .attr("x1", vis.width / 2)
       .attr("y1", vis.height / 2)
       .attr("x2", function(d, i) { return vis.width / 2 * (1 - Math.sin(i * vis.config.radians / vis.totalAxes)); })
@@ -201,8 +214,9 @@ class SpiderChart {
 
     // builds out the axes labels
     vis.axes
-      .data(vis.allAxis).enter()
-      .append("svg:text").classed("axis-labels", true)
+      .data(vis.allAxis)
+      // .enter()
+      .join("svg:text").classed("axis-labels", true)
       .text(function(d) { return d; })
       .attr("text-anchor", "middle")
       .attr("x", function(d, i) { return vis.width / 2 * (1 - 1.3 * Math.sin(i * vis.config.radians / vis.totalAxes)); })
@@ -223,8 +237,9 @@ class SpiderChart {
     // builds out the polygon vertices of the dataset
     vis.groupedData.forEach(function(group, g) {
       vis.vertices
-        .data(group.axes).enter()
-        .append("svg:circle").classed("polygon-vertices", true)
+        .data(group.axes)
+        // .enter()
+        .join("svg:circle").classed("polygon-vertices", true)
         .attr("r", vis.config.polygonPointSize)
         .attr("cx", function(d, i) { return d.coordinates.x; })
         .attr("cy", function(d, i) { return d.coordinates.y; })
@@ -248,8 +263,9 @@ class SpiderChart {
 
     // builds out the polygon areas of the dataset
     vis.vertices
-      .data(vis.groupedData).enter()
-      .append("svg:polygon").classed("polygon-areas", true)
+      .data(vis.groupedData)
+      // .enter()
+      .join("svg:polygon").classed("polygon-areas", true)
       .attr("points", function(group) { // build verticesString for each group
         var verticesString = "";
         group.axes.forEach(function(d) { verticesString += d.coordinates.x + "," + d.coordinates.y + " "; });
@@ -293,8 +309,9 @@ class SpiderChart {
     // builds out the legend
     //Create legend squares
     vis.legend.selectAll(".legend-tiles")
-      .data(vis.groupedData).enter()
-      .append("svg:rect").classed("legend-tiles", true)
+      .data(vis.groupedData)
+      // .enter()
+      .join("svg:rect").classed("legend-tiles", true)
       .attr("x", vis.width - vis.config.paddingX / 2)
       .attr("y", function(d, i) { return i * 2 * vis.config.legendBoxSize; })
       .attr("width", vis.config.legendBoxSize)
@@ -303,8 +320,9 @@ class SpiderChart {
 
     //Create text next to squares
     vis.legend.selectAll(".legend-labels")
-      .data(vis.groupedData).enter()
-      .append("svg:text").classed("legend-labels", true)
+      .data(vis.groupedData)
+      // .enter()
+      .join("svg:text").classed("legend-labels", true)
       .attr("x", vis.width - vis.config.paddingX / 2 + (1.5 * vis.config.legendBoxSize))
       .attr("y", function(d, i) { return i * 2 * vis.config.legendBoxSize; })
       .attr("dy", 0.07 * vis.config.legendBoxSize + "em")
