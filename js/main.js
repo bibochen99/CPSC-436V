@@ -3,7 +3,7 @@ const dispatcher = d3.dispatch("timeline", "selectMap", "selectScatter", "select
 /**
  * Load and combine data
  */
-let geoData, data, filteredData, lanLonData, choroplethMap, spiderChart;
+let geoData, data, filteredData, lanLonData, choroplethMap, spiderChart, smiley;
 Promise.all([
   d3.json("data/world_countries_topo.json"),
   d3.csv("data/world-happiness-report.csv"),
@@ -65,6 +65,7 @@ Promise.all([
     max = range[1];
   
   entryData.forEach((d) => {
+    d.select = false;
     if (d["Life Ladder"] == max || d["Life Ladder"] == min) {
       d.Display = true;
     }
@@ -88,7 +89,6 @@ Promise.all([
     entryData
   );
   scatterplot.updateVis();
-
 
 
   // Create a waypoint for each `step` container
@@ -117,6 +117,13 @@ Promise.all([
     dispatcher,
     2013
   );
+
+  smiley = new Smileyface(
+    {
+      parentElement: "#smiley",
+    },
+    20, 20
+  );
 });
 
 dispatcher.on("timeline", selectedYear => {
@@ -125,4 +132,38 @@ dispatcher.on("timeline", selectedYear => {
   choroplethMap.step0();
   spiderChart.currYear = selectedYear;
   spiderChart.updateVis();
+});
+/**
+ * Dispatcher waits for 'selectMap' event
+ *  filter data based on the selected categories and update the plot
+ */
+// TODO: selectedCategories contain country name, and will only have up to 5 country names, Ex. ["Russia","China"]
+dispatcher.on("selectMap", (selectedCategories) => {
+  /**
+   * A sample how to modifies the dataset
+   */
+
+  // if (selectedCategories.length !== 0) {
+  //   let selected = selectedCategories[0];
+  //   data.forEach((d) => {
+  //     if (d.gender === selected) {
+  //       d.showup = 1;
+  //       d.barclicked = 1;
+  //     } else {
+  //       d.showup = 0;
+  //       d.barclicked = 0;
+  //     }
+  //   });
+  // } else {
+  //   data.forEach((d) => {
+  //     d.showup = 1;
+  //     d.idup = 0;
+  //     d.arrowup = 0;
+  //     d.barclicked = 0;
+  //   });
+  //}
+  // update other vis
+
+  // scatterplot.updateVis();
+  // lexisplot.updateVis();
 });
