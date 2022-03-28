@@ -5,7 +5,7 @@ class Scatterplot {
      * @param {Object}
      * @param {Array}
      */
-    constructor(_config, _data, _xAttr) {
+    constructor(_config, _data,_dispatcher, _xAttr,_currYear) {
       this.config = {
         parentElement: _config.parentElement,
         containerWidth: _config.containerWidth || 400,
@@ -13,8 +13,10 @@ class Scatterplot {
         margin: _config.margin || {top: 25, right: 20, bottom: 20, left: 35},
         tooltipPadding: _config.tooltipPadding || 15
       }
-      this.data = _data;
+      this.Data = _data;
+      this.dispatcher = _dispatcher;
       this.xAttr = _xAttr;
+      this.currYear = _currYear;
       this.initVis();
     }
     
@@ -36,14 +38,14 @@ class Scatterplot {
   
       // Initialize axes
       vis.xAxis = d3.axisBottom(vis.xScale)
-          .ticks(6)
+          .ticks(8)
           .tickSize(-vis.height - 10)
           .tickPadding(10)
           .tickFormat(d => d)
           .tickSizeOuter(0);
   
       vis.yAxis = d3.axisLeft(vis.yScale)
-          .ticks(6)
+          .ticks(8)
           .tickSize(-vis.width - 10)
           .tickPadding(10)
           .tickSizeOuter(0);
@@ -89,13 +91,18 @@ class Scatterplot {
      */
     updateVis() {
       let vis = this;
+
+      //Filter the data in the given year
+      vis.data = vis.Data.filter((d) => {
+        return d.year == vis.currYear;
+      });
       // Specificy accessor functions
       vis.xValue = d => d[vis.xAttr];
       vis.yValue = d => d["Life Ladder"];
   
       // Set the scale input domains
-      vis.xScale.domain([0, d3.max(vis.data, vis.xValue)]);
-      vis.yScale.domain([0, d3.max(vis.data, vis.yValue)]);
+      vis.xScale.domain([d3.min(vis.data, vis.xValue)>0? 0:d3.min(vis.data, vis.xValue), d3.max(vis.data, vis.xValue)]);
+      vis.yScale.domain([d3.min(vis.data, vis.yValue)>0? 0:d3.min(vis.data, vis.yValue), d3.max(vis.data, vis.yValue)]);
 
       vis.xLabel.text(vis.xAttr);
   
@@ -125,7 +132,13 @@ class Scatterplot {
               return false;
             }
           });
-  
+
+      let selectedCountry = [];
+      vis.data.forEach((d) => {
+        if(d.select){
+          selectedCountry.push(d["Country name"]);
+        }
+      })
       // Tooltip event listeners
       circles
           .on('mouseover', (event,d) => {
@@ -144,11 +157,12 @@ class Scatterplot {
             if (!d.select) {
               d3.select(this).classed('selected', true);
               d.select = true;
+              selectedCountry.push(d["Country name"]);
             } else {
               d3.select(this).classed('selected', false);
               d.select = false;
             }
-            //vis.dispatcher.call('selectedCountry', event);
+            vis.dispatcher.call('selectedCountry',event,selectedCountry);
           })
           .on('mouseleave', () => {
             d3.select('#scatterplot-tooltip').style('display', 'none');
