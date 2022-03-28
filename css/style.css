@@ -1,5 +1,5 @@
 body {
-  font-family: 'Open Sans', sans-serif;
+  font-family: "Open Sans", sans-serif;
   font-size: 13px;
   padding: 5px;
 }
@@ -10,14 +10,14 @@ body {
   /* border: 1px solid #ddd; */
   margin: auto;
   margin-bottom: 100px;
-  margin-top:20px;
+  margin-top: 20px;
   display: flex;
   flex-direction: column;
   gap: 20px;
   width: 1000px;
 }
 .prose-container {
-  height:500px;
+  height: 500px;
   overflow-y: scroll;
 }
 #prose {
@@ -27,7 +27,7 @@ body {
   height: 300px;
   margin-top: 150px;
 }
-#map-h1{
+#map-h1 {
   margin-left: 450px;
   width: 800px;
   /* display: inline; */
@@ -38,7 +38,9 @@ body {
   width: 600px;
   margin-top: 60px;
 }
-
+.disabled {
+  pointer-events: none;
+}
 #scatterplot {
   position: fixed;
   width: 500px;
@@ -91,7 +93,7 @@ body {
   font-weight: 500;
   padding: 10px;
   color: #333;
-  z-index:100;
+  z-index: 100;
 }
 .tooltip-title {
   color: #000;
@@ -147,7 +149,7 @@ body {
   font-weight: 500;
   padding: 10px;
   color: #333;
-  z-index:100;
+  z-index: 100;
 }
 
 #smiley {
@@ -158,8 +160,9 @@ body {
 }
 
 footer a,
-footer a:hover, footer a:visited {
-  color: #D2A000;
+footer a:hover,
+footer a:visited {
+  color: #d2a000;
 }
 .text-small {
   font-size: 12px;
@@ -199,7 +202,7 @@ pre {
   margin-left: 20px;
 }
 
-.scatter-plot.selected{
+.scatter-plot.selected {
   stroke: orange;
   stroke-width: 3;
 }
@@ -250,8 +253,8 @@ pre {
 }
 */
 
-.geo-path.active{
-  fill:darkgoldenrod;
+.geo-path.active {
+  fill: darkgoldenrod;
   opacity: 1;
 }
 .disabled {
