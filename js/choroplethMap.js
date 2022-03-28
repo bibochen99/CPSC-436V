@@ -40,7 +40,6 @@ class ChoroplethMap {
    */
   initVis() {
     let vis = this;
-
     // Calculate inner chart size. Margin specifies the space around the actual chart.
     vis.width =
       vis.config.containerWidth -
@@ -167,7 +166,6 @@ class ChoroplethMap {
 
   step0() {
     let vis = this;
-
     // Legend title
     vis.legendRect = vis.legend
       .append("rect")
@@ -289,6 +287,8 @@ class ChoroplethMap {
       .attr("stop-color", (d) => d.color);
     vis.legendRect.attr("fill", "url(#legend-gradient)");
 
+    //static dispatcher
+    this.staticDispatcherHelper("Life Ladder", vis, min, max, 0);
     //call dispatcherHelper
     this.dispatcherHelper("lifeLadder", vis);
   }
@@ -376,6 +376,8 @@ class ChoroplethMap {
       .attr("stop-color", (d) => d.color);
 
     vis.legendRect.attr("fill", "url(#legend-gradient)");
+    //static dispatcher
+    this.staticDispatcherHelper("Social support", vis, min, max, 1);
     //call dispatcherHelper
     this.dispatcherHelper("socialSupport", vis);
   }
@@ -457,6 +459,9 @@ class ChoroplethMap {
       .join("stop")
       .attr("offset", (d) => d.offset)
       .attr("stop-color", (d) => d.color);
+
+    //static dispatcher
+    this.staticDispatcherHelper("Log GDP per capita", vis, min, max, 2);
     //call dispatcherHelper
     this.dispatcherHelper("gdp", vis);
   }
@@ -543,6 +548,13 @@ class ChoroplethMap {
       .join("stop")
       .attr("offset", (d) => d.offset)
       .attr("stop-color", (d) => d.color);
+    //static dispatcher
+    this.staticDispatcherHelper(
+      "Healthy life expectancy at birth",
+      vis,
+      min,
+      max,3
+    );
     //call dispatcherHelper
     this.dispatcherHelper("healthyLife", vis);
   }
@@ -627,6 +639,8 @@ class ChoroplethMap {
       .join("stop")
       .attr("offset", (d) => d.offset)
       .attr("stop-color", (d) => d.color);
+    //static dispatcher
+    this.staticDispatcherHelper("Freedom to make life choices", vis, min, max,4);
     //call dispatcherHelper
     this.dispatcherHelper("free", vis);
   }
@@ -715,6 +729,9 @@ class ChoroplethMap {
       .join("stop")
       .attr("offset", (d) => d.offset)
       .attr("stop-color", (d) => d.color);
+    //static dispatcher
+    this.staticDispatcherHelper("Perceptions of corruption", vis, min, max,5);
+
     //call dispatcherHelper
     this.dispatcherHelper("perceptions", vis);
   }
@@ -796,6 +813,8 @@ class ChoroplethMap {
       .join("stop")
       .attr("offset", (d) => d.offset)
       .attr("stop-color", (d) => d.color);
+    //static dispatcher
+    this.staticDispatcherHelper("Positive affect", vis, min, max,6);
     //call dispatcherHelper
     this.dispatcherHelper("positive", vis);
   }
@@ -875,6 +894,8 @@ class ChoroplethMap {
       .join("stop")
       .attr("offset", (d) => d.offset)
       .attr("stop-color", (d) => d.color);
+    //static dispatcher
+    this.staticDispatcherHelper("Negative affect", vis, min, max,7);
     //call dispatcherHelper
     this.dispatcherHelper("negative", vis);
   }
@@ -956,6 +977,8 @@ class ChoroplethMap {
       .join("stop")
       .attr("offset", (d) => d.offset)
       .attr("stop-color", (d) => d.color);
+    //static dispatcher
+    this.staticDispatcherHelper("Generosity", vis, min, max,8);
     //call dispatcherHelper
     this.dispatcherHelper("generosity", vis);
   }
@@ -1014,5 +1037,31 @@ class ChoroplethMap {
       // Trigger filter event and pass array with the selected country name
       vis.dispatcher.call("selectMap", event, selectedCategories);
     });
+  }
+
+  // helper function for map dispatcher
+  staticDispatcherHelper(attrName, vis, min, max, stepNumber) {
+    let year = vis.config.currYear;
+
+    vis.data.forEach((d) => {
+      d["stepNumber"] = -1;
+      d["stepNumber"] = stepNumber;
+      if (d.year == year) {
+        if (d[attrName] == max) {
+          d.max = 1;
+        } else {
+          d.max = 0;
+        }
+        if (d[attrName] == min) {
+          d.min = 1;
+        } else {
+          d.min = 0;
+        }
+      } else {
+        d.max = 0;
+        d.min = 0;
+      }
+    });
+    vis.dispatcher.call("staticMap", attrName, vis.data);
   }
 }
