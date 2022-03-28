@@ -1,4 +1,4 @@
-const dispatcher = d3.dispatch("timeline", "selectMap", "selectScatter", "selectedCountry");
+const dispatcher = d3.dispatch("timeline", "selectMap", "selectScatter", "selectedCountry","staticMap");
 
 /**
  * Load and combine data
@@ -152,7 +152,9 @@ dispatcher.on("selectedCountry", selectedCountry => {
       d.display = false;
     }
   })
+  console.log(spiderChart);
   spiderChart.data = data;
+  
   spiderChart.updateVis();
   smiley.Data = data;
   smiley.updateVis();
@@ -168,27 +170,18 @@ dispatcher.on("selectMap", (selectedCategories) => {
    * A sample how to modifies the dataset
    */
 
-  // if (selectedCategories.length !== 0) {
-  //   let selected = selectedCategories[0];
-  //   data.forEach((d) => {
-  //     if (d.gender === selected) {
-  //       d.showup = 1;
-  //       d.barclicked = 1;
-  //     } else {
-  //       d.showup = 0;
-  //       d.barclicked = 0;
-  //     }
-  //   });
-  // } else {
-  //   data.forEach((d) => {
-  //     d.showup = 1;
-  //     d.idup = 0;
-  //     d.arrowup = 0;
-  //     d.barclicked = 0;
-  //   });
-  //}
-  // update other vis
+  // xxx.updateVis();
+  // xxx.updateVis();
+});
 
-  // scatterplot.updateVis();
-  // lexisplot.updateVis();
+/**
+ * Dispatcher waits for 'staticMap' event
+ *  filter data based on the selected categories and update the plot
+ */
+// TODO: 
+dispatcher.on("staticMap", (d) => {
+  /**
+   * A sample how to modifies the dataset
+   */
+
 });
