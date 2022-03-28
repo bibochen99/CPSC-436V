@@ -32,7 +32,7 @@ class ChoroplethMap {
     this.data = _data;
     this.dispatcher = _dispatcher;
     this.currYear = _currYear;
-    this.currStep = 0;
+    this.cleared = 0;
     this.initVis();
   }
 
@@ -204,7 +204,9 @@ class ChoroplethMap {
       max = range[1];
 
     // helper function
-    this.indicatorHelper("lifeLadder", min, max, vis);
+    if (!vis.cleared) {
+      this.indicatorHelper("lifeLadder", min, max, vis);
+    }
 
     // color scale domain
     vis.colorScale.domain(vis.mapValue);
@@ -300,7 +302,9 @@ class ChoroplethMap {
     let range = d3.extent(vis.filteredData, (d) => d["Social support"]);
     let min = range[0],
       max = range[1];
-    this.indicatorHelper("socialSupport", min, max, vis);
+    if (!vis.cleared) {
+      this.indicatorHelper("socialSupport", min, max, vis);
+    }
     vis.colorScale.domain(vis.mapValue);
     vis.legendStops = [
       { color: "#cfe2f2", value: min, offset: 0 },
@@ -388,7 +392,9 @@ class ChoroplethMap {
     let range = d3.extent(vis.filteredData, (d) => d["Log GDP per capita"]);
     let min = range[0],
       max = range[1];
-    this.indicatorHelper("gdp", min, max, vis);
+    if (!vis.cleared) {
+      this.indicatorHelper("gdp", min, max, vis);
+    }
     vis.colorScale.domain(vis.mapValue);
     vis.legendStops = [
       { color: "#cfe2f2", value: min, offset: 0 },
@@ -476,7 +482,9 @@ class ChoroplethMap {
     );
     let min = range[0],
       max = range[1];
-    this.indicatorHelper("healthyLife", min, max, vis);
+    if (!vis.cleared) {
+      this.indicatorHelper("healthyLife", min, max, vis);
+    }
     vis.colorScale.domain(vis.mapValue);
     vis.legendStops = [
       { color: "#cfe2f2", value: min, offset: 0 },
@@ -569,7 +577,9 @@ class ChoroplethMap {
     );
     let min = range[0],
       max = range[1];
-    this.indicatorHelper("free", min, max, vis);
+    if (!vis.cleared) {
+      this.indicatorHelper("free", min, max, vis);
+    }
     vis.colorScale.domain(vis.mapValue);
     vis.legendStops = [
       { color: "#cfe2f2", value: min, offset: 0 },
@@ -656,7 +666,9 @@ class ChoroplethMap {
     );
     let min = range[0],
       max = range[1];
-    this.indicatorHelper("perceptions", min, max, vis);
+    if (vis.cleared) {
+      this.indicatorHelper("perceptions", min, max, vis);
+    }
     vis.colorScale.domain(vis.mapValue);
     vis.legendStops = [
       { color: "#cfe2f2", value: min, offset: 0 },
@@ -746,7 +758,9 @@ class ChoroplethMap {
     let range = d3.extent(vis.filteredData, (d) => d["Positive affect"]);
     let min = range[0],
       max = range[1];
-    this.indicatorHelper("positive", min, max, vis);
+    if (!vis.cleared) {
+      this.indicatorHelper("positive", min, max, vis);
+    }
     vis.colorScale.domain(vis.mapValue);
     vis.legendStops = [
       { color: "#cfe2f2", value: min, offset: 0 },
