@@ -113,6 +113,8 @@ class SpiderChart {
   updateVis() {
     let vis = this;
 
+    d3.select(this).select("svg").remove();
+
     vis.filterYear = vis.data.filter((d) => d.year == vis.currYear);
     vis.filterYear.forEach((d) => {
       if (d.Display) {

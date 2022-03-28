@@ -130,7 +130,7 @@ Promise.all([
 // clear button
 d3.select("#mapSearch").on("click", function (event, d) {
   data.forEach((d) => {
-    d.selected = 0;
+    d.Display = 0;
   });
   choroplethMap.updateVis();
   scatterplot.updateVis();
