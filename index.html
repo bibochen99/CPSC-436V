@@ -9,9 +9,15 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css">
   </head>
   <body>
     <h1 id="map-h1">World Map</h1>
+    <div id="mapWidgets">
+      <div id="year-slider"></div>
+      <input id="mapSearch" type="text" name="" placeholder="Search for a country">
+      <button id="clear" type="button">Clear all</button>
+    </div>
     <div class="container">
       <div id="map"></div>
       <div id="map-tooltip"></div>
@@ -21,11 +27,7 @@
       <div id="scatterplot-tooltip"></div>
       <div id="spider-tooltip"></div>
       <div id="spider"></div>
-      <div id="mapWidgets">
-        <div id="year-slider"></div>
-        <input id="mapSearch" type="text" name="" placeholder="Search for a country">
-        <button id="clear" type="button">Clear selected</button>
-      </div>
+      
 
       <div id="prose">
         <div class="step" id="step0">Life Ladders</div>

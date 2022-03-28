@@ -63,9 +63,9 @@ class Smileyface {
           grad.append("stop").attr("offset", life/2).style("stop-color", "lightblue");
           grad.append("stop").attr("offset", 0).style("stop-color", "white");
         }
-        console.log(life);
+        // console.log(life);
         life = life - 2>0 ? life-2:0;
-        console.log(i + " " + j);
+        // console.log(i + " " + j);
         vis.circle = this.g.append('circle')
           .attr('r', this.height / 2)
           .attr('stroke', 'black')
