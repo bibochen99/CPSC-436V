@@ -249,13 +249,13 @@ pre {
 .polygon-areas {
   fill-opacity: 0.6;
 }
+*/
 .legend-tiles {
   fill-opacity: 0.3;
 }
 .legend-labels {
   font-size: 15px;
 }
-*/
 
 .geo-path.active {
   fill: darkgoldenrod;

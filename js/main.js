@@ -144,7 +144,6 @@ dispatcher.on("timeline", selectedYear => {
 });
 
 dispatcher.on("selectedCountry", selectedCountry => {
-  console.log("countries " + selectedCountry);
   data.forEach((d) => {
     if(selectedCountry.includes(d["Country name"]) && d.select){
       d.display = true;

@@ -106,24 +106,22 @@ class SpiderChart {
       .attr("width", vis.config.containerWidth / 2)
       .attr("transform", "translate(" + 0 + ", " + 1.1 * vis.config.containerHeight + ")");
 
+    vis.renderStatic();
     vis.updateVis();
   }
 
+  // Update data
   updateVis() {
     let vis = this;
 
+    // remove old data from the chart
     d3.select(vis.config.parentElement).selectAll("polygon").remove();
     d3.select(vis.config.parentElement).selectAll(".polygon-vertices").remove();
 
+    // Preprocess data
     vis.filterYear = vis.data.filter((d) => {
       return (d.year == vis.currYear) && d.display
     });
-    vis.filterYear.forEach((d) => {
-      if (d.display) {
-        console.log(d["Country name"]);
-      }
-    });
-
     vis.groupedData = [];
     vis.groups = [];
     vis.filterYear.forEach(function(record) {
@@ -165,9 +163,10 @@ class SpiderChart {
     vis.renderVis();
   }
 
-  renderVis() {
+  // Render the unchanging parts of the chart
+  renderStatic() {
     let vis = this;
-
+    
     // builds out the levels of the spiderweb
     for (var level = 0; level < vis.config.levels; level++) {
       let levelFactor = vis.radius * ((level + 1) / vis.config.levels);
@@ -227,6 +226,11 @@ class SpiderChart {
       .attr("y", function(d, i) { return vis.height / 2 * (1 - 1.1 * Math.cos(i * vis.config.radians / vis.totalAxes)); })
       .attr("font-family", "sans-serif")
       .attr("font-size", 11 * vis.config.labelScale + "px");
+  }
+
+  // Render the dynamic parts of the chart
+  renderVis() {
+    let vis = this;
 
     // builds [x, y] coordinates of polygon vertices.
     vis.groupedData.forEach(function(group) {
