@@ -7,9 +7,9 @@ class ChoroplethMap {
   constructor(_config, _geoData, _data, _dispatcher, _currYear) {
     this.config = {
       parentElement: _config.parentElement,
-      containerWidth: _config.containerWidth || 800,
+      containerWidth: _config.containerWidth || 900,
       containerHeight: _config.containerHeight || 300,
-      margin: _config.margin || { top: 20, right: 20, bottom: 20, left: 20 },
+      margin: _config.margin || { top: 100, right: 20, bottom: 20, left: 20 },
       tooltipPadding: 10,
       legendBottom: 50,
       legendLeft: 50,
@@ -67,8 +67,7 @@ class ChoroplethMap {
         `translate(${vis.config.margin.left},${vis.config.margin.top})`
       );
 
-    // Defines the scale and translate of the projection so that the geometry fits within the SVG area
-    // We crop Antartica because it takes up a lot of space that is not needed for our data
+    // Defines the projection and path
     vis.projection = d3
       .geoEquirectangular()
       .center([0, 15]) // set centre to further North
@@ -77,6 +76,7 @@ class ChoroplethMap {
 
     vis.geoPath = d3.geoPath().projection(vis.projection);
 
+    // Initialize color scale
     // vis.colorScale = d3.scaleOrdinal().range(["#d3eecd", "#7bc77e", "#2a8d46"]); // light green to dark green
     vis.colorScale = d3
       .scaleLinear()
@@ -100,6 +100,7 @@ class ChoroplethMap {
         })`
       );
 
+    //Initialize geoJoinPath
     vis.geoJoinPath = vis.chart
       .selectAll(".geo-path")
       .data(
@@ -108,6 +109,7 @@ class ChoroplethMap {
       )
       .join("path");
 
+    //Initialize Title
     vis.legendTitle = vis.legend
       .append("text")
       .attr("class", "legend-title")
@@ -129,9 +131,9 @@ class ChoroplethMap {
       .tickFormat(d3.timeFormat("%Y"))
       .tickValues(vis.dataTime)
       .default(new Date(2013, 1, 1))
-      .on('onchange', (val) => {
-        let selectedYear = d3.timeFormat('%Y')(val);
-        d3.select('p#value-time').text(d3.timeFormat('%Y')(val));
+      .on("onchange", (val) => {
+        let selectedYear = d3.timeFormat("%Y")(val);
+        d3.select("p#value-time").text(d3.timeFormat("%Y")(val));
         // vis.config.currYear = selectedYear;
         // vis.step0();
         vis.dispatcher.call("timeline", event, selectedYear);
@@ -159,27 +161,26 @@ class ChoroplethMap {
     //   .onSelected(vis.onSelect)
     //   .render();
 
+    // call step 0
     vis.step0();
   }
 
-  onSelect() {
-    //
-  }
-          
   step0() {
     let vis = this;
 
+    // Legend title
     vis.legendRect = vis.legend
       .append("rect")
       .attr("width", vis.config.legendRectWidth)
       .attr("height", vis.config.legendRectHeight);
-
     vis.legendTitle.text("Life Ladder");
 
+    // filter data by year
     vis.filteredData = vis.data.filter((d) => {
       return d.year == vis.currYear;
     });
 
+    // combine dataset
     vis.geoData.objects.world_countries.geometries.forEach((d) => {
       for (let i = 0; i < vis.filteredData.length; i++) {
         if (d.properties.name == vis.filteredData[i]["Country name"]) {
@@ -202,30 +203,21 @@ class ChoroplethMap {
       }
     });
 
+    // update map value to life ladder
     vis.mapValue = d3.extent(
       vis.geoData.objects.world_countries.geometries,
       (d) => d.properties.lifeLadder
     );
 
+    // update range, max & min indicator
     let range = d3.extent(vis.filteredData, (d) => d["Life Ladder"]);
-
     let min = range[0],
       max = range[1];
 
-    vis.geoData.objects.world_countries.geometries.forEach((d) => {
-      if (
-        d.properties.lifeLadder == max &&
-        d.properties.year == vis.config.currYear
-      ) {
-        d.properties.isMax = 1;
-      } else if (d.properties.lifeLadder == min) {
-        d.properties.isMin = 1;
-      } else {
-        d.properties.isMax = 0;
-        d.properties.isMin = 0;
-      }
-    });
+    // helper function
+    this.indicatorHelper("lifeLadder", min, max, vis);
 
+    // color scale domain
     vis.colorScale.domain(vis.mapValue);
 
     // Define begin and end of the color gradient (legend)
@@ -291,67 +283,54 @@ class ChoroplethMap {
       .attr("stop-color", (d) => d.color);
     vis.legendRect.attr("fill", "url(#legend-gradient)");
 
-    // console.log(vis.geoData);
-
     // on click event and dispatcher
     let selectedCategories = [];
-
     vis.geoJoinPath.on("click", function (event, d) {
       // Check if current category is active and toggle class
+      d3.selectAll(".geo-path").attr("fill", (d) =>
+        vis.colorScale(d.properties.lifeLadder)
+      );
 
       const isActive = d3.select(this).classed("active");
 
       d3.select(this).classed("active", !isActive);
-      if (selectedCategories.length < 5) {
-        selectedCategories.push(this.id);
-      }
-      // console.log(selectedCategories);
-      // if (!selectedCategories.includes(this.id)) {
-      //   selectedCategories.push(this.id);
-      // } else {
-      //   selectedCategories = selectedCategories.filter((d) => {
-      //     return d !== this.id;
-      //   });
-      // }
 
-      // // Trigger filter event and pass array with the selected category names
+      if (
+        !selectedCategories.includes(this.id) &&
+        selectedCategories.length <= 5
+      ) {
+        selectedCategories.push(this.id);
+      } else {
+        selectedCategories = selectedCategories.filter((d) => {
+          return d !== this.id;
+        });
+      }
+
+      // Trigger filter event and pass array with the selected country name
       vis.dispatcher.call("selectMap", event, selectedCategories);
     });
   }
 
   step1() {
     let vis = this;
+    // update title
     vis.legendTitle.text("Social Support");
 
+    // update map value
     vis.mapValue = d3.extent(
       vis.geoData.objects.world_countries.geometries,
       (d) => d.properties.socialSupport
     );
+
+    // update range, max & min indicator, helper function, legend value
     let range = d3.extent(vis.filteredData, (d) => d["Social support"]);
     let min = range[0],
       max = range[1];
-    vis.geoData.objects.world_countries.geometries.forEach((d) => {
-      d.properties.isMax = 0;
-      d.properties.isMin = 0;
-    });
-
-    vis.geoData.objects.world_countries.geometries.forEach((d) => {
-      if (
-        d.properties.socialSupport == max &&
-        d.properties.year == vis.config.currYear
-      ) {
-        d.properties.isMax = 1;
-      } else if (d.properties.socialSupport == min) {
-        d.properties.isMin = 1;
-      } else {
-        d.properties.isMax = 0;
-        d.properties.isMin = 0;
-      }
-    });
+    this.indicatorHelper("socialSupport", min, max, vis);
     vis.colorScale.domain(vis.mapValue);
     vis.legendStops = [
-      { color: "lightgreen", value: min, offset: 0 },
-      { color: "green", value: max, offset: 100 },
+      { color: "#cfe2f2", value: min, offset: 0 },
+      { color: "#0d306b", value: max, offset: 100 },
     ];
 
     // Append world map
@@ -370,7 +349,7 @@ class ChoroplethMap {
     vis.geoJoinPath
       .on("mousemove", (event, d) => {
         let name = d.properties.name;
-        let ladder = d.properties.socialSupport
+        let socialSupport = d.properties.socialSupport
           ? d.properties.socialSupport
           : "N/A";
         d3
@@ -379,7 +358,7 @@ class ChoroplethMap {
           .style("left", event.pageX + vis.config.tooltipPadding + "px")
           .style("top", event.pageY + vis.config.tooltipPadding + "px").html(`
             <div class="tooltip-title">${name}</div>
-            Social Support: ${ladder}
+            Social Support: ${socialSupport}
             `);
       })
       .on("mouseleave", () => {
@@ -412,34 +391,22 @@ class ChoroplethMap {
 
   step2() {
     let vis = this;
+    // update title
     vis.legendTitle.text("Log GDP per capita");
-
+    // update map value
     vis.mapValue = d3.extent(
       vis.geoData.objects.world_countries.geometries,
       (d) => d.properties.gdp
     );
+    // update range, max & min indicator, helper function, legend value
     let range = d3.extent(vis.filteredData, (d) => d["Log GDP per capita"]);
     let min = range[0],
       max = range[1];
-    vis.geoData.objects.world_countries.geometries.forEach((d) => {
-      d.properties.isMax = 0;
-      d.properties.isMin = 0;
-    });
-
-    vis.geoData.objects.world_countries.geometries.forEach((d) => {
-      if (d.properties.gdp == max) {
-        d.properties.isMax = 1;
-      } else if (d.properties.gdp == min) {
-        d.properties.isMin = 1;
-      } else {
-        d.properties.isMax = 0;
-        d.properties.isMin = 0;
-      }
-    });
+    this.indicatorHelper("gdp", min, max, vis);
     vis.colorScale.domain(vis.mapValue);
     vis.legendStops = [
-      { color: "lightgreen", value: min, offset: 0 },
-      { color: "green", value: max, offset: 100 },
+      { color: "#cfe2f2", value: min, offset: 0 },
+      { color: "#0d306b", value: max, offset: 100 },
     ];
 
     // Append world map
@@ -458,14 +425,14 @@ class ChoroplethMap {
     vis.geoJoinPath
       .on("mousemove", (event, d) => {
         let name = d.properties.name;
-        let ladder = d.properties.gdp ? d.properties.gdp : "N/A";
+        let gdp = d.properties.gdp ? d.properties.gdp : "N/A";
         d3
           .select("#map-tooltip")
           .style("display", "block")
           .style("left", event.pageX + vis.config.tooltipPadding + "px")
           .style("top", event.pageY + vis.config.tooltipPadding + "px").html(`
             <div class="tooltip-title">${name}</div>
-            Log GDP per capita: ${ladder}
+            Log GDP per capita: ${gdp}
             `);
       })
       .on("mouseleave", () => {
@@ -492,42 +459,29 @@ class ChoroplethMap {
       .join("stop")
       .attr("offset", (d) => d.offset)
       .attr("stop-color", (d) => d.color);
-
-    vis.legendRect.attr("fill", "url(#legend-gradient)");
   }
   step3() {
     let vis = this;
+    // update title
     vis.legendTitle.text("Healthy life expectancy at birth");
-
+    // update map value
     vis.mapValue = d3.extent(
       vis.geoData.objects.world_countries.geometries,
       (d) => d.properties.healthyLife
     );
+
+    // update range, max & min indicator, helper function, legend value
     let range = d3.extent(
       vis.filteredData,
       (d) => d["Healthy life expectancy at birth"]
     );
     let min = range[0],
       max = range[1];
-    vis.geoData.objects.world_countries.geometries.forEach((d) => {
-      d.properties.isMax = 0;
-      d.properties.isMin = 0;
-    });
-
-    vis.geoData.objects.world_countries.geometries.forEach((d) => {
-      if (d.properties.healthyLife == max) {
-        d.properties.isMax = 1;
-      } else if (d.properties.healthyLife == min) {
-        d.properties.isMin = 1;
-      } else {
-        d.properties.isMax = 0;
-        d.properties.isMin = 0;
-      }
-    });
+    this.indicatorHelper("healthyLife", min, max, vis);
     vis.colorScale.domain(vis.mapValue);
     vis.legendStops = [
-      { color: "lightgreen", value: min, offset: 0 },
-      { color: "green", value: max, offset: 100 },
+      { color: "#cfe2f2", value: min, offset: 0 },
+      { color: "#0d306b", value: max, offset: 100 },
     ];
 
     // Append world map
@@ -546,7 +500,7 @@ class ChoroplethMap {
     vis.geoJoinPath
       .on("mousemove", (event, d) => {
         let name = d.properties.name;
-        let ladder = d.properties.healthyLife
+        let healthyLife = d.properties.healthyLife
           ? d.properties.healthyLife
           : "N/A";
         d3
@@ -555,7 +509,7 @@ class ChoroplethMap {
           .style("left", event.pageX + vis.config.tooltipPadding + "px")
           .style("top", event.pageY + vis.config.tooltipPadding + "px").html(`
             <div class="tooltip-title">${name}</div>
-            Healthy life expectancy at birth: ${ladder}
+            Healthy life expectancy at birth: ${healthyLife}
             `);
       })
       .on("mouseleave", () => {
@@ -582,42 +536,28 @@ class ChoroplethMap {
       .join("stop")
       .attr("offset", (d) => d.offset)
       .attr("stop-color", (d) => d.color);
-
-    vis.legendRect.attr("fill", "url(#legend-gradient)");
   }
   step4() {
     let vis = this;
+    // update title
     vis.legendTitle.text("Freedom to make life choices");
-
+    // update map value
     vis.mapValue = d3.extent(
       vis.geoData.objects.world_countries.geometries,
       (d) => d.properties.free
     );
+    // update range, max & min indicator, helper function, legend value
     let range = d3.extent(
       vis.filteredData,
       (d) => d["Freedom to make life choices"]
     );
     let min = range[0],
       max = range[1];
-    vis.geoData.objects.world_countries.geometries.forEach((d) => {
-      d.properties.isMax = 0;
-      d.properties.isMin = 0;
-    });
-
-    vis.geoData.objects.world_countries.geometries.forEach((d) => {
-      if (d.properties.free == max) {
-        d.properties.isMax = 1;
-      } else if (d.properties.free == min) {
-        d.properties.isMin = 1;
-      } else {
-        d.properties.isMax = 0;
-        d.properties.isMin = 0;
-      }
-    });
+    this.indicatorHelper("free", min, max, vis);
     vis.colorScale.domain(vis.mapValue);
     vis.legendStops = [
-      { color: "lightgreen", value: min, offset: 0 },
-      { color: "green", value: max, offset: 100 },
+      { color: "#cfe2f2", value: min, offset: 0 },
+      { color: "#0d306b", value: max, offset: 100 },
     ];
 
     // Append world map
@@ -633,17 +573,18 @@ class ChoroplethMap {
           return vis.colorScale(d.properties.free);
         }
       });
+
     vis.geoJoinPath
       .on("mousemove", (event, d) => {
         let name = d.properties.name;
-        let ladder = d.properties.free ? d.properties.free : "N/A";
+        let free = d.properties.free ? d.properties.free : "N/A";
         d3
           .select("#map-tooltip")
           .style("display", "block")
           .style("left", event.pageX + vis.config.tooltipPadding + "px")
           .style("top", event.pageY + vis.config.tooltipPadding + "px").html(`
             <div class="tooltip-title">${name}</div>
-            Freedom to make life choices: ${ladder}
+            Freedom to make life choices: ${free}
             `);
       })
       .on("mouseleave", () => {
@@ -670,42 +611,28 @@ class ChoroplethMap {
       .join("stop")
       .attr("offset", (d) => d.offset)
       .attr("stop-color", (d) => d.color);
-
-    vis.legendRect.attr("fill", "url(#legend-gradient)");
   }
   step5() {
     let vis = this;
+    // update title
     vis.legendTitle.text("Perceptions of corruption");
-
+    // update map value
     vis.mapValue = d3.extent(
       vis.geoData.objects.world_countries.geometries,
       (d) => d.properties.perceptions
     );
+    // update range, max & min indicator, helper function, legend value
     let range = d3.extent(
       vis.filteredData,
       (d) => d["Perceptions of corruption"]
     );
     let min = range[0],
       max = range[1];
-    vis.geoData.objects.world_countries.geometries.forEach((d) => {
-      d.properties.isMax = 0;
-      d.properties.isMin = 0;
-    });
-
-    vis.geoData.objects.world_countries.geometries.forEach((d) => {
-      if (d.properties.perceptions == max) {
-        d.properties.isMax = 1;
-      } else if (d.properties.perceptions == min) {
-        d.properties.isMin = 1;
-      } else {
-        d.properties.isMax = 0;
-        d.properties.isMin = 0;
-      }
-    });
+    this.indicatorHelper("perceptions", min, max, vis);
     vis.colorScale.domain(vis.mapValue);
     vis.legendStops = [
-      { color: "lightgreen", value: min, offset: 0 },
-      { color: "green", value: max, offset: 100 },
+      { color: "#cfe2f2", value: min, offset: 0 },
+      { color: "#0d306b", value: max, offset: 100 },
     ];
 
     // Append world map
@@ -724,11 +651,11 @@ class ChoroplethMap {
     vis.geoJoinPath
       .on("mousemove", (event, d) => {
         let name = d.properties.name;
-        let ladder;
+        let perceptions;
         if (d.properties.perceptions === undefined) {
-          ladder = "N/A";
+          perceptions = "N/A";
         } else {
-          ladder = d.properties.perceptions;
+          perceptions = d.properties.perceptions;
         }
         d3
           .select("#map-tooltip")
@@ -736,7 +663,7 @@ class ChoroplethMap {
           .style("left", event.pageX + vis.config.tooltipPadding + "px")
           .style("top", event.pageY + vis.config.tooltipPadding + "px").html(`
             <div class="tooltip-title">${name}</div>
-            Perceptions of corruption: ${ladder}
+            Perceptions of corruption: ${perceptions}
             `);
       })
       .on("mouseleave", () => {
@@ -763,39 +690,26 @@ class ChoroplethMap {
       .join("stop")
       .attr("offset", (d) => d.offset)
       .attr("stop-color", (d) => d.color);
-
-    vis.legendRect.attr("fill", "url(#legend-gradient)");
   }
   step6() {
     let vis = this;
+    // update title
     vis.legendTitle.text("Positive affect");
-
+    // update map value
     vis.mapValue = d3.extent(
       vis.geoData.objects.world_countries.geometries,
       (d) => d.properties.positive
     );
+    // update range, max & min indicator, helper function, legend value
+
     let range = d3.extent(vis.filteredData, (d) => d["Positive affect"]);
     let min = range[0],
       max = range[1];
-    vis.geoData.objects.world_countries.geometries.forEach((d) => {
-      d.properties.isMax = 0;
-      d.properties.isMin = 0;
-    });
-
-    vis.geoData.objects.world_countries.geometries.forEach((d) => {
-      if (d.properties.positive == max) {
-        d.properties.isMax = 1;
-      } else if (d.properties.positive == min) {
-        d.properties.isMin = 1;
-      } else {
-        d.properties.isMax = 0;
-        d.properties.isMin = 0;
-      }
-    });
+    this.indicatorHelper("positive", min, max, vis);
     vis.colorScale.domain(vis.mapValue);
     vis.legendStops = [
-      { color: "lightgreen", value: min, offset: 0 },
-      { color: "green", value: max, offset: 100 },
+      { color: "#cfe2f2", value: min, offset: 0 },
+      { color: "#0d306b", value: max, offset: 100 },
     ];
 
     // Append world map
@@ -814,14 +728,14 @@ class ChoroplethMap {
     vis.geoJoinPath
       .on("mousemove", (event, d) => {
         let name = d.properties.name;
-        let ladder = d.properties.positive ? d.properties.positive : "N/A";
+        let positive = d.properties.positive ? d.properties.positive : "N/A";
         d3
           .select("#map-tooltip")
           .style("display", "block")
           .style("left", event.pageX + vis.config.tooltipPadding + "px")
           .style("top", event.pageY + vis.config.tooltipPadding + "px").html(`
             <div class="tooltip-title">${name}</div>
-            Positive affect: ${ladder}
+            Positive affect: ${positive}
             `);
       })
       .on("mouseleave", () => {
@@ -848,41 +762,26 @@ class ChoroplethMap {
       .join("stop")
       .attr("offset", (d) => d.offset)
       .attr("stop-color", (d) => d.color);
-
-    vis.legendRect.attr("fill", "url(#legend-gradient)");
   }
   step7() {
     let vis = this;
+    // update title
     vis.legendTitle.text("Negative affect");
-
+    // update map value
     vis.mapValue = d3.extent(
       vis.geoData.objects.world_countries.geometries,
       (d) => d.properties.negative
     );
+    // update range, max & min indicator, helper function, legend value
     let range = d3.extent(vis.filteredData, (d) => d["Negative affect"]);
     let min = range[0],
       max = range[1];
-    vis.geoData.objects.world_countries.geometries.forEach((d) => {
-      d.properties.isMax = 0;
-      d.properties.isMin = 0;
-    });
-
-    vis.geoData.objects.world_countries.geometries.forEach((d) => {
-      if (d.properties.negative == max) {
-        d.properties.isMax = 1;
-      } else if (d.properties.negative == min) {
-        d.properties.isMin = 1;
-      } else {
-        d.properties.isMax = 0;
-        d.properties.isMin = 0;
-      }
-    });
+    this.indicatorHelper("negative", min, max, vis);
     vis.colorScale.domain(vis.mapValue);
     vis.legendStops = [
-      { color: "lightgreen", value: min, offset: 0 },
-      { color: "green", value: max, offset: 100 },
+      { color: "#cfe2f2", value: min, offset: 0 },
+      { color: "#0d306b", value: max, offset: 100 },
     ];
-
     // Append world map
     vis.geoJoinPath
       .transition()
@@ -899,14 +798,14 @@ class ChoroplethMap {
     vis.geoJoinPath
       .on("mousemove", (event, d) => {
         let name = d.properties.name;
-        let ladder = d.properties.negative ? d.properties.negative : "N/A";
+        let negative = d.properties.negative ? d.properties.negative : "N/A";
         d3
           .select("#map-tooltip")
           .style("display", "block")
           .style("left", event.pageX + vis.config.tooltipPadding + "px")
           .style("top", event.pageY + vis.config.tooltipPadding + "px").html(`
             <div class="tooltip-title">${name}</div>
-            Negative affect: ${ladder}
+            Negative affect: ${negative}
             `);
       })
       .on("mouseleave", () => {
@@ -933,41 +832,26 @@ class ChoroplethMap {
       .join("stop")
       .attr("offset", (d) => d.offset)
       .attr("stop-color", (d) => d.color);
-
-    vis.legendRect.attr("fill", "url(#legend-gradient)");
   }
   step8() {
     let vis = this;
+    // update title
     vis.legendTitle.text("Generosity");
-
+    // update map value
     vis.mapValue = d3.extent(
       vis.geoData.objects.world_countries.geometries,
       (d) => d.properties.generosity
     );
+    // update range, max & min indicator, helper function, legend value
     let range = d3.extent(vis.filteredData, (d) => d["Generosity"]);
     let min = range[0],
       max = range[1];
-    vis.geoData.objects.world_countries.geometries.forEach((d) => {
-      d.properties.isMax = 0;
-      d.properties.isMin = 0;
-    });
-
-    vis.geoData.objects.world_countries.geometries.forEach((d) => {
-      if (d.properties.generosity == max) {
-        d.properties.isMax = 1;
-      } else if (d.properties.generosity == min) {
-        d.properties.isMin = 1;
-      } else {
-        d.properties.isMax = 0;
-        d.properties.isMin = 0;
-      }
-    });
+    this.indicatorHelper("generosity", min, max, vis);
     vis.colorScale.domain(vis.mapValue);
     vis.legendStops = [
-      { color: "lightgreen", value: min, offset: 0 },
-      { color: "green", value: max, offset: 100 },
+      { color: "#cfe2f2", value: min, offset: 0 },
+      { color: "#0d306b", value: max, offset: 100 },
     ];
-
     // Append world map
     vis.geoJoinPath
       .transition()
@@ -984,14 +868,16 @@ class ChoroplethMap {
     vis.geoJoinPath
       .on("mousemove", (event, d) => {
         let name = d.properties.name;
-        let ladder = d.properties.generosity ? d.properties.generosity : "N/A";
+        let generosity = d.properties.generosity
+          ? d.properties.generosity
+          : "N/A";
         d3
           .select("#map-tooltip")
           .style("display", "block")
           .style("left", event.pageX + vis.config.tooltipPadding + "px")
           .style("top", event.pageY + vis.config.tooltipPadding + "px").html(`
             <div class="tooltip-title">${name}</div>
-            Generosity: ${ladder}
+            Generosity: ${generosity}
             `);
       })
       .on("mouseleave", () => {
@@ -1018,11 +904,33 @@ class ChoroplethMap {
       .join("stop")
       .attr("offset", (d) => d.offset)
       .attr("stop-color", (d) => d.color);
-
-    vis.legendRect.attr("fill", "url(#legend-gradient)");
   }
-
   goToStep(stepIndex) {
     this[this.config.steps[stepIndex]]();
+  }
+
+  // Helper function
+  indicatorHelper(input, min, max, vis) {
+    vis.geoData.objects.world_countries.geometries.forEach((d) => {
+      d.properties.isMax = 0;
+      d.properties.isMin = 0;
+    });
+
+    vis.geoData.objects.world_countries.geometries.forEach((d) => {
+      if (
+        d.properties[input] == max &&
+        d.properties.year == vis.config.currYear
+      ) {
+        d.properties.isMax = 1;
+      } else if (
+        d.properties[input] == min &&
+        d.properties.year == vis.config.currYear
+      ) {
+        d.properties.isMin = 1;
+      } else {
+        d.properties.isMax = 0;
+        d.properties.isMin = 0;
+      }
+    });
   }
 }

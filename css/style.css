@@ -24,9 +24,14 @@ body {
   margin-left: 95%;
 }
 #prose .step {
-  height: 500px;
+  height: 300px;
+  margin-top: 150px;
 }
-
+#map-h1{
+  margin-left: 450px;
+  width: 800px;
+  /* display: inline; */
+}
 #map {
   display: block;
   position: fixed;
@@ -244,3 +249,11 @@ pre {
   font-size: 15px;
 }
 */
+
+.geo-path.active{
+  fill:darkgoldenrod;
+  opacity: 1;
+}
+.disabled {
+  pointer-events: none;
+}
