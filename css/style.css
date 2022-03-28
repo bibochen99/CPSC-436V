@@ -138,6 +138,7 @@ body {
   display: block;
   top: 55%;
   left: 50%;
+  z-index: 10;
 }
 
 #spider-tooltip {
@@ -157,7 +158,9 @@ body {
   position: fixed;
   display: block;
   top: 55%;
-  left: 55%;
+  left: 43%;
+  /* max-height: 105px; */
+  /* overflow-y: hidden; */
 }
 
 footer a,
