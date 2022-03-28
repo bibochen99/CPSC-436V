@@ -117,11 +117,12 @@ Promise.all([
 });
 
 // clear button
-d3.select("#mapSearch").on("click", function (event, d) {
+d3.select("#clear").on("click", function (event, d) {
   data.forEach((d) => {
-    d.Display = 0;
+    d.display = 0;
+    d.select = 0;
   });
-  choroplethMap.updateVis();
+  choroplethMap.step0();
   scatterplot.updateVis();
   spiderChart.updateVis();
 });
@@ -134,7 +135,6 @@ d3.select("#filterScatter").on("change", function(d) {
 });
 
 dispatcher.on("timeline", selectedYear => {
-  console.log("year: " + selectedYear);
   choroplethMap.currYear = selectedYear;
   choroplethMap.step0();
   spiderChart.currYear = selectedYear;
@@ -144,9 +144,8 @@ dispatcher.on("timeline", selectedYear => {
 });
 
 dispatcher.on("selectedCountry", selectedCountry => {
-  console.log(selectedCountry);
   data.forEach((d) => {
-    if(selectedCountry.includes(d["Country name"])){
+    if(selectedCountry.includes(d["Country name"]) && d.select){
       d.display = true;
     }else{
       d.display = false;
