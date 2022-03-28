@@ -115,7 +115,7 @@ class SpiderChart {
 
     vis.filterYear = vis.data.filter((d) => d.year == vis.currYear);
     vis.filterYear.forEach((d) => {
-      if (d.Display) {
+      if (d.display) {
         console.log(d);
       }
     });
@@ -124,7 +124,7 @@ class SpiderChart {
     vis.groups = [];
     vis.filterYear.forEach(function(record) {
       let group = record["Country name"];
-      if (vis.groups.indexOf(group) < 0 && record["Display"]) {
+      if (vis.groups.indexOf(group) < 0 && record["display"]) {
         vis.groups.push(group); // push to unique groups tracking
         vis.groupedData.push({ // push group node in data
           lifeLadder: record["Life Ladder"],

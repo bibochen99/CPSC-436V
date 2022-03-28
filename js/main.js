@@ -1,4 +1,4 @@
-const dispatcher = d3.dispatch("timeline", "selectMap", "selectScatter", "selectSpider");
+const dispatcher = d3.dispatch("timeline", "selectMap", "selectScatter", "selectedCountry");
 
 /**
  * Load and combine data
@@ -22,24 +22,10 @@ Promise.all([
     d["Perceptions of corruption"] = +d["Perceptions of corruption"];
     d["Positive affect"] = +d["Positive affect"];
     d["Negative affect"] = +d["Negative affect"];
-    d.Display = false;
+    d.display = false;
   });
 
-  let entryData = data.filter((d) => {
-    return d.year == 2013;
-  });
 
-  // entryData range and filter
-  let range = d3.extent(entryData, (d) => d["Life Ladder"]);
-  let min = range[0],
-    max = range[1];
-  
-  entryData.forEach((d) => {
-    d.select = false;
-    if (d["Life Ladder"] == max || d["Life Ladder"] == min) {
-      d.Display = true;
-    }
-  });
 
   // map search
   $(() => {
@@ -86,8 +72,10 @@ Promise.all([
     {
       parentElement: "#scatterplot",
     },
-    entryData,
-    "Social support"
+    data,
+    dispatcher,
+    "Social support",
+    2013
   );
   scatterplot.updateVis();
 
@@ -123,7 +111,8 @@ Promise.all([
     {
       parentElement: "#smiley",
     },
-    20, 20
+    data,
+    2013
   );
 });
 
@@ -150,6 +139,24 @@ dispatcher.on("timeline", selectedYear => {
   choroplethMap.step0();
   spiderChart.currYear = selectedYear;
   spiderChart.updateVis();
+  scatterplot.currYear = selectedYear;
+  scatterplot.updateVis();
+});
+
+dispatcher.on("selectedCountry", selectedCountry => {
+  console.log(selectedCountry);
+  data.forEach((d) => {
+    if(selectedCountry.includes(d["Country name"])){
+      d.display = true;
+    }else{
+      d.display = false;
+    }
+  })
+  spiderChart.data = data;
+  spiderChart.updateVis();
+  smiley.Data = data;
+  smiley.updateVis();
+  
 });
 /**
  * Dispatcher waits for 'selectMap' event
