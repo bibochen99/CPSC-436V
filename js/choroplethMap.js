@@ -154,16 +154,8 @@ class ChoroplethMap {
     vis.step0();
   }
 
-  step0() {
+  filterData() {
     let vis = this;
-    vis.currStep = 0;
-    // Legend title
-    vis.legendRect = vis.legend
-      .append("rect")
-      .attr("width", vis.config.legendRectWidth)
-      .attr("height", vis.config.legendRectHeight);
-    vis.legendTitle.text("Life Ladder");
-
     // filter data by year
     vis.filteredData = vis.data.filter((d) => {
       return d.year == vis.currYear;
@@ -191,6 +183,19 @@ class ChoroplethMap {
         }
       }
     });
+  }
+
+  step0() {
+    let vis = this;
+    vis.currStep = 0;
+    // Legend title
+    vis.legendRect = vis.legend
+      .append("rect")
+      .attr("width", vis.config.legendRectWidth)
+      .attr("height", vis.config.legendRectHeight);
+    vis.legendTitle.text("Life Ladder");
+
+    vis.filterData();
 
     // update map value to life ladder
     vis.mapValue = d3.extent(

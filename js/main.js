@@ -142,7 +142,7 @@ d3.select("#filterScatter").on("change", function(d) {
 dispatcher.on("timeline", selectedYear => {
   choroplethMap.currYear = selectedYear;
   let currStep = data[0]["stepNumber"];
-  // console.log(currStep);
+  choroplethMap.filterData();
   choroplethMap.goToStep(currStep);
   spiderChart.currYear = selectedYear;
   spiderChart.updateVis();
