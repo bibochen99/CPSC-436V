@@ -31,6 +31,7 @@ body {
   display: block;
   position: fixed;
   width: 600px;
+  margin-top: 60px;
 }
 
 #scatterplot {
@@ -109,11 +110,19 @@ body {
   font-size: 11px;
 }
 
-#slider {
-  display: inline-block;
+#mapWidgets {
+  display: inline-flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  gap: 10px;
+  align-items: center;
   position: fixed;
-  margin-top: 20%;
-  margin-left: 10%;
+  margin-top: -20px;
+  margin-left: 0%;
+}
+
+#mapSearch {
+  height: 20px;
 }
 
 #spider {

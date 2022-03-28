@@ -145,9 +145,25 @@ class ChoroplethMap {
       .attr("transform", "translate(30,30)")
       .call(vis.yearSlider);
 
+    // Label for current year
     // d3.select('p#value-time').text(d3.timeFormat('%Y')(vis.yearSlider.value()));
 
+    // Search with autocomplete (implement after M2 if time allows)
+    // http://www.brightpointinc.com/clients/brightpointinc.com/library/autocomplete/index.html?source=d3js
+    // vis.search = autocomplete(d3.select("#searchMap"))
+    //   .keys(d3.map(vis.data, function (d) { return d["Country name"]; }).keys())
+    //   .dataField("Country name")
+    //   .placeHolder("Search for a country")
+    //   .width(960)
+    //   .height(500)
+    //   .onSelected(vis.onSelect)
+    //   .render();
+
     vis.step0();
+  }
+
+  onSelect() {
+    //
   }
           
   step0() {

@@ -71,6 +71,22 @@ Promise.all([
     }
   });
 
+  // map search
+  $(() => {
+    $( "#mapSearch" ).autocomplete({
+      source: d3.map(data, function (d) { return d["Country name"]; }).keys()
+    });
+  
+    $("#mapSearch").keyup(function (e) {
+      if (e.keyCode == 13) {
+        // console.log('pressed enter');
+        selectedCountry = $('#mapSearch').val();
+        dispatcher.call("selectMap", event, selectedCountry);
+      }
+    });
+  });
+  
+
   // add groups to the scatterplot's dropdown filter
   d3.select("#filterScatter")
       .selectAll('myOptions')
@@ -138,6 +154,16 @@ Promise.all([
     },
     20, 20
   );
+});
+
+// clear button
+d3.select("#mapSearch").on("click", function (event, d) {
+  data.forEach((d) => {
+    d.selected = 0;
+  });
+  choroplethMap.updateVis();
+  scatterplot.updateVis();
+  spiderChart.updateVis();
 });
 
 d3.select("#filterScatter").on("change", function(d) {
