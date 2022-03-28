@@ -152,9 +152,9 @@ dispatcher.on("selectedCountry", selectedCountry => {
       d.display = false;
     }
   })
-  console.log(spiderChart);
+
   spiderChart.data = data;
-  
+ 
   spiderChart.updateVis();
   smiley.Data = data;
   smiley.updateVis();
