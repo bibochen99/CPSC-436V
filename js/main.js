@@ -148,6 +148,8 @@ dispatcher.on("timeline", selectedYear => {
   spiderChart.updateVis();
   scatterplot.currYear = selectedYear;
   scatterplot.updateVis();
+  smiley.currYear = selectedYear;
+  smiley.updateVis();
 });
 
 dispatcher.on("selectedCountry", selectedCountry => {
