@@ -125,8 +125,8 @@ d3.select("#clear").on("click", function (event, d) {
   });
   let currStep = data[0]["stepNumber"];
   // choroplethMap.cleared = 1;
-  // choroplethMap.goToStep(currStep);
-  choroplethMap.step0();
+  choroplethMap.goToStep(currStep);
+  // choroplethMap.step0();
   scatterplot.updateVis();
   spiderChart.updateVis();
   smiley.updateVis();
