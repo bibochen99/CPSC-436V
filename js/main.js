@@ -3,7 +3,7 @@ const dispatcher = d3.dispatch("timeline", "selectMap", "selectScatter", "select
 /**
  * Load and combine data
  */
-let geoData, data, filteredData, lanLonData, choroplethMap, spiderChart, smiley;
+let geoData, data, filteredData, lanLonData, choroplethMap, spiderChart, smiley, scatterplot;
 Promise.all([
   d3.json("data/world_countries_topo.json"),
   d3.csv("data/world-happiness-report.csv"),
@@ -25,12 +25,12 @@ Promise.all([
     d.display = false;
   });
 
-
-
   // map search
   $(() => {
+    let countryNames = d3.map(data, function (d) { return d["Country name"]; });
+    let uniqueNames = countryNames.filter((name, i, j) => j.indexOf(name) === i);
     $( "#mapSearch" ).autocomplete({
-      source: d3.map(data, function (d) { return d["Country name"]; }).keys()
+      source: uniqueNames
     });
   
     $("#mapSearch").keyup(function (e) {
@@ -55,17 +55,6 @@ Promise.all([
       .text(function (d) { return d; }) // text showed in the menu
       .attr("value", function (d) { return d; })
       .property("selected", function(d){ return d === "Social support"; });
-
-  // choroplethMap init
-  choroplethMap = new ChoroplethMap(
-    {
-      parentElement: "#map",
-    },
-    geoData,
-    data,
-    dispatcher,
-    2013
-  );
 
   // Scatterplot init
   scatterplot = new Scatterplot(
@@ -114,17 +103,31 @@ Promise.all([
     data,
     2013
   );
+
+    // choroplethMap init
+    choroplethMap = new ChoroplethMap(
+      {
+        parentElement: "#map",
+      },
+      geoData,
+      data,
+      dispatcher,
+      2013
+    );
 });
 
 // clear button
 d3.select("#clear").on("click", function (event, d) {
   data.forEach((d) => {
     d.display = 0;
-    d.select = 0;
+    d.min = 0;
+    d.max = 0;
+    // d.select = 0;
   });
   choroplethMap.step0();
   scatterplot.updateVis();
   spiderChart.updateVis();
+  smiley.updateVis();
 });
 
 d3.select("#filterScatter").on("change", function(d) {
@@ -136,7 +139,9 @@ d3.select("#filterScatter").on("change", function(d) {
 
 dispatcher.on("timeline", selectedYear => {
   choroplethMap.currYear = selectedYear;
-  choroplethMap.step0();
+  let currStep = data[0]["stepNumber"];
+  // console.log(currStep);
+  choroplethMap.goToStep(currStep);
   spiderChart.currYear = selectedYear;
   spiderChart.updateVis();
   scatterplot.currYear = selectedYear;
@@ -153,24 +158,33 @@ dispatcher.on("selectedCountry", selectedCountry => {
   })
 
   spiderChart.data = data;
- 
   spiderChart.updateVis();
   smiley.Data = data;
   smiley.updateVis();
-  
 });
 /**
  * Dispatcher waits for 'selectMap' event
  *  filter data based on the selected categories and update the plot
  */
 // TODO: selectedCategories contain country name, and will only have up to 5 country names, Ex. ["Russia","China"]
-dispatcher.on("selectMap", (selectedCategories) => {
+dispatcher.on("selectMap", (selectedCountries) => {
   /**
    * A sample how to modifies the dataset
    */
+  data.forEach((d) => {
+    if (selectedCountries.includes(d["Country name"])) {
+      d.display = true;
+    } else {
+      d.display = false;
+    }
+  });
 
-  // xxx.updateVis();
-  // xxx.updateVis();
+  scatterplot.data = data;
+  scatterplot.updateVis();
+  spiderChart.data = data;
+  spiderChart.updateVis();
+  smiley.Data = data;
+  smiley.updateVis();
 });
 
 /**
@@ -178,9 +192,23 @@ dispatcher.on("selectMap", (selectedCategories) => {
  *  filter data based on the selected categories and update the plot
  */
 // TODO: 
-dispatcher.on("staticMap", (d) => {
+dispatcher.on("staticMap", (newData) => {
   /**
    * A sample how to modifies the dataset
    */
+  // console.log(newData);
+  newData.forEach((d) => {
+    if (d.min || d.max) {
+      d.display = true;
+    } else {
+      d.display = false;
+    }
+  });
 
+  scatterplot.data = newData;
+  scatterplot.updateVis();
+  spiderChart.data = newData;
+  spiderChart.updateVis();
+  smiley.Data = newData;
+  smiley.updateVis();
 });

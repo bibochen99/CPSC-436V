@@ -28,7 +28,7 @@ body {
   margin-top: 150px;
 }
 #map-h1 {
-  margin-left: 450px;
+  margin-left: 15%;
   width: 800px;
   position: fixed;
   display: inline-block;
@@ -125,8 +125,11 @@ body {
   gap: 10px;
   align-items: center;
   position: fixed;
-  margin-top: -20px;
-  margin-left: 0%;
+  margin-top: 0;
+  margin-left: 28%;
+  padding-right: 50px;
+  background-color: #fff;
+  z-index:10;
 }
 
 #mapSearch {
@@ -263,4 +266,7 @@ pre {
 }
 .disabled {
   pointer-events: none;
+}
+.ui-autocomplete {
+  position: fixed !important;
 }

@@ -15,7 +15,7 @@ class ChoroplethMap {
       legendLeft: 50,
       legendRectHeight: 12,
       legendRectWidth: 150,
-      currYear: 2013,
+      // currYear: 2013,
       steps: [
         "step0",
         "step1",
@@ -32,6 +32,7 @@ class ChoroplethMap {
     this.data = _data;
     this.dispatcher = _dispatcher;
     this.currYear = _currYear;
+    this.currStep = 0;
     this.initVis();
   }
 
@@ -135,7 +136,7 @@ class ChoroplethMap {
         d3.select("p#value-time").text(d3.timeFormat("%Y")(val));
         // vis.config.currYear = selectedYear;
         // vis.step0();
-        vis.dispatcher.call("timeline", event, selectedYear);
+        vis.dispatcher.call("timeline", event, selectedYear, vis.currStep);
       });
 
     d3.select("div#year-slider")
@@ -149,23 +150,13 @@ class ChoroplethMap {
     // Label for current year
     // d3.select('p#value-time').text(d3.timeFormat('%Y')(vis.yearSlider.value()));
 
-    // Search with autocomplete (implement after M2 if time allows)
-    // http://www.brightpointinc.com/clients/brightpointinc.com/library/autocomplete/index.html?source=d3js
-    // vis.search = autocomplete(d3.select("#searchMap"))
-    //   .keys(d3.map(vis.data, function (d) { return d["Country name"]; }).keys())
-    //   .dataField("Country name")
-    //   .placeHolder("Search for a country")
-    //   .width(960)
-    //   .height(500)
-    //   .onSelected(vis.onSelect)
-    //   .render();
-
     // call step 0
     vis.step0();
   }
 
   step0() {
     let vis = this;
+    vis.currStep = 0;
     // Legend title
     vis.legendRect = vis.legend
       .append("rect")
@@ -295,6 +286,7 @@ class ChoroplethMap {
 
   step1() {
     let vis = this;
+    vis.currStep = 1;
     // update title
     vis.legendTitle.text("Social Support");
 
@@ -384,6 +376,7 @@ class ChoroplethMap {
 
   step2() {
     let vis = this;
+    vis.currStep = 2;
     // update title
     vis.legendTitle.text("Log GDP per capita");
     // update map value
@@ -467,6 +460,7 @@ class ChoroplethMap {
   }
   step3() {
     let vis = this;
+    vis.currStep = 3;
     // update title
     vis.legendTitle.text("Healthy life expectancy at birth");
     // update map value
@@ -560,6 +554,7 @@ class ChoroplethMap {
   }
   step4() {
     let vis = this;
+    vis.currStep = 4;
     // update title
     vis.legendTitle.text("Freedom to make life choices");
     // update map value
@@ -646,6 +641,7 @@ class ChoroplethMap {
   }
   step5() {
     let vis = this;
+    vis.currStep = 5;
     // update title
     vis.legendTitle.text("Perceptions of corruption");
     // update map value
@@ -737,6 +733,7 @@ class ChoroplethMap {
   }
   step6() {
     let vis = this;
+    vis.currStep = 6;
     // update title
     vis.legendTitle.text("Positive affect");
     // update map value
@@ -820,6 +817,7 @@ class ChoroplethMap {
   }
   step7() {
     let vis = this;
+    vis.currStep = 7;
     // update title
     vis.legendTitle.text("Negative affect");
     // update map value
@@ -901,6 +899,7 @@ class ChoroplethMap {
   }
   step8() {
     let vis = this;
+    vis.currStep = 8;
     // update title
     vis.legendTitle.text("Generosity");
     // update map value
@@ -996,12 +995,12 @@ class ChoroplethMap {
     vis.geoData.objects.world_countries.geometries.forEach((d) => {
       if (
         d.properties[input] == max &&
-        d.properties.year == vis.config.currYear
+        d.properties.year == vis.currYear
       ) {
         d.properties.isMax = 1;
       } else if (
         d.properties[input] == min &&
-        d.properties.year == vis.config.currYear
+        d.properties.year == vis.currYear
       ) {
         d.properties.isMin = 1;
       } else {
@@ -1013,7 +1012,7 @@ class ChoroplethMap {
 
   // helper function for map dispatcher
   dispatcherHelper(inputAttribute, vis) {
-    let selectedCategories = [];
+    let selectedCountries = [];
     vis.geoJoinPath.on("click", function (event, d) {
       // Check if current category is active and toggle class
       d3.selectAll(".geo-path").attr("fill", (d) =>
@@ -1025,23 +1024,23 @@ class ChoroplethMap {
       d3.select(this).classed("active", !isActive);
 
       if (
-        !selectedCategories.includes(this.id) &&
-        selectedCategories.length <= 5
+        !selectedCountries.includes(this.id) &&
+        selectedCountries.length <= 5
       ) {
-        selectedCategories.push(this.id);
+        selectedCountries.push(this.id);
       } else {
-        selectedCategories = selectedCategories.filter((d) => {
+        selectedCountries = selectedCountries.filter((d) => {
           return d !== this.id;
         });
       }
       // Trigger filter event and pass array with the selected country name
-      vis.dispatcher.call("selectMap", event, selectedCategories);
+      vis.dispatcher.call("selectMap", event, selectedCountries);
     });
   }
 
   // helper function for map dispatcher
   staticDispatcherHelper(attrName, vis, min, max, stepNumber) {
-    let year = vis.config.currYear;
+    let year = vis.currYear;
 
     vis.data.forEach((d) => {
       d["stepNumber"] = -1;
