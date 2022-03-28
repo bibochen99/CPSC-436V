@@ -215,7 +215,13 @@ class ChoroplethMap {
     // Append world map
     vis.geoJoinPath
       .transition()
-      .attr("class", "geo-path")
+      .attr("class", (d) => {
+        if (d.properties.lifeLadder === undefined) {
+          return "geo-path disabled";
+        } else {
+          return "geo-path";
+        }
+      })
       .attr("id", (d) => d.properties.name)
       .attr("d", vis.geoPath)
       .attr("fill", (d) => {
@@ -269,32 +275,8 @@ class ChoroplethMap {
       .attr("stop-color", (d) => d.color);
     vis.legendRect.attr("fill", "url(#legend-gradient)");
 
-    // on click event and dispatcher
-    let selectedCategories = [];
-    vis.geoJoinPath.on("click", function (event, d) {
-      // Check if current category is active and toggle class
-      d3.selectAll(".geo-path").attr("fill", (d) =>
-        vis.colorScale(d.properties.lifeLadder)
-      );
-
-      const isActive = d3.select(this).classed("active");
-
-      d3.select(this).classed("active", !isActive);
-
-      if (
-        !selectedCategories.includes(this.id) &&
-        selectedCategories.length <= 5
-      ) {
-        selectedCategories.push(this.id);
-      } else {
-        selectedCategories = selectedCategories.filter((d) => {
-          return d !== this.id;
-        });
-      }
-
-      // Trigger filter event and pass array with the selected country name
-      vis.dispatcher.call("selectMap", event, selectedCategories);
-    });
+    //call dispatcherHelper
+    this.dispatcherHelper("lifeLadder", vis);
   }
 
   step1() {
@@ -322,6 +304,13 @@ class ChoroplethMap {
     // Append world map
     vis.geoJoinPath
       .transition()
+      .attr("class", (d) => {
+        if (d.properties.socialSupport === undefined) {
+          return "geo-path disabled";
+        } else {
+          return "geo-path";
+        }
+      })
       .attr("d", vis.geoPath)
       .attr("fill", (d) => {
         if (d.properties.isMax == 1) {
@@ -373,6 +362,8 @@ class ChoroplethMap {
       .attr("stop-color", (d) => d.color);
 
     vis.legendRect.attr("fill", "url(#legend-gradient)");
+    //call dispatcherHelper
+    this.dispatcherHelper("socialSupport", vis);
   }
 
   step2() {
@@ -398,6 +389,13 @@ class ChoroplethMap {
     // Append world map
     vis.geoJoinPath
       .transition()
+      .attr("class", (d) => {
+        if (d.properties.gdp === undefined) {
+          return "geo-path disabled";
+        } else {
+          return "geo-path";
+        }
+      })
       .attr("d", vis.geoPath)
       .attr("fill", (d) => {
         if (d.properties.isMax == 1) {
@@ -445,6 +443,8 @@ class ChoroplethMap {
       .join("stop")
       .attr("offset", (d) => d.offset)
       .attr("stop-color", (d) => d.color);
+    //call dispatcherHelper
+    this.dispatcherHelper("gdp", vis);
   }
   step3() {
     let vis = this;
@@ -473,6 +473,13 @@ class ChoroplethMap {
     // Append world map
     vis.geoJoinPath
       .transition()
+      .attr("class", (d) => {
+        if (d.properties.healthyLife === undefined) {
+          return "geo-path disabled";
+        } else {
+          return "geo-path";
+        }
+      })
       .attr("d", vis.geoPath)
       .attr("fill", (d) => {
         if (d.properties.isMax == 1) {
@@ -522,6 +529,8 @@ class ChoroplethMap {
       .join("stop")
       .attr("offset", (d) => d.offset)
       .attr("stop-color", (d) => d.color);
+    //call dispatcherHelper
+    this.dispatcherHelper("healthyLife", vis);
   }
   step4() {
     let vis = this;
@@ -549,6 +558,13 @@ class ChoroplethMap {
     // Append world map
     vis.geoJoinPath
       .transition()
+      .attr("class", (d) => {
+        if (d.properties.free === undefined) {
+          return "geo-path disabled";
+        } else {
+          return "geo-path";
+        }
+      })
       .attr("d", vis.geoPath)
       .attr("fill", (d) => {
         if (d.properties.isMax == 1) {
@@ -597,6 +613,8 @@ class ChoroplethMap {
       .join("stop")
       .attr("offset", (d) => d.offset)
       .attr("stop-color", (d) => d.color);
+    //call dispatcherHelper
+    this.dispatcherHelper("free", vis);
   }
   step5() {
     let vis = this;
@@ -625,6 +643,13 @@ class ChoroplethMap {
     vis.geoJoinPath
       .transition()
       .attr("d", vis.geoPath)
+      .attr("class", (d) => {
+        if (d.properties.perceptions === undefined) {
+          return "geo-path disabled";
+        } else {
+          return "geo-path";
+        }
+      })
       .attr("fill", (d) => {
         if (d.properties.isMax == 1) {
           return "#F4CF49";
@@ -676,6 +701,8 @@ class ChoroplethMap {
       .join("stop")
       .attr("offset", (d) => d.offset)
       .attr("stop-color", (d) => d.color);
+    //call dispatcherHelper
+    this.dispatcherHelper("perceptions", vis);
   }
   step6() {
     let vis = this;
@@ -701,6 +728,13 @@ class ChoroplethMap {
     // Append world map
     vis.geoJoinPath
       .transition()
+      .attr("class", (d) => {
+        if (d.properties.positive === undefined) {
+          return "geo-path disabled";
+        } else {
+          return "geo-path";
+        }
+      })
       .attr("d", vis.geoPath)
       .attr("fill", (d) => {
         if (d.properties.isMax == 1) {
@@ -748,6 +782,8 @@ class ChoroplethMap {
       .join("stop")
       .attr("offset", (d) => d.offset)
       .attr("stop-color", (d) => d.color);
+    //call dispatcherHelper
+    this.dispatcherHelper("positive", vis);
   }
   step7() {
     let vis = this;
@@ -771,6 +807,13 @@ class ChoroplethMap {
     // Append world map
     vis.geoJoinPath
       .transition()
+      .attr("class", (d) => {
+        if (d.properties.negative === undefined) {
+          return "geo-path disabled";
+        } else {
+          return "geo-path";
+        }
+      })
       .attr("d", vis.geoPath)
       .attr("fill", (d) => {
         if (d.properties.isMax == 1) {
@@ -818,6 +861,8 @@ class ChoroplethMap {
       .join("stop")
       .attr("offset", (d) => d.offset)
       .attr("stop-color", (d) => d.color);
+    //call dispatcherHelper
+    this.dispatcherHelper("negative", vis);
   }
   step8() {
     let vis = this;
@@ -841,6 +886,13 @@ class ChoroplethMap {
     // Append world map
     vis.geoJoinPath
       .transition()
+      .attr("class", (d) => {
+        if (d.properties.generosity === undefined) {
+          return "geo-path disabled";
+        } else {
+          return "geo-path";
+        }
+      })
       .attr("d", vis.geoPath)
       .attr("fill", (d) => {
         if (d.properties.isMax == 1) {
@@ -890,6 +942,8 @@ class ChoroplethMap {
       .join("stop")
       .attr("offset", (d) => d.offset)
       .attr("stop-color", (d) => d.color);
+    //call dispatcherHelper
+    this.dispatcherHelper("generosity", vis);
   }
   goToStep(stepIndex) {
     this[this.config.steps[stepIndex]]();
@@ -917,6 +971,34 @@ class ChoroplethMap {
         d.properties.isMax = 0;
         d.properties.isMin = 0;
       }
+    });
+  }
+
+  // helper function for map dispatcher
+  dispatcherHelper(inputAttribute, vis) {
+    let selectedCategories = [];
+    vis.geoJoinPath.on("click", function (event, d) {
+      // Check if current category is active and toggle class
+      d3.selectAll(".geo-path").attr("fill", (d) =>
+        vis.colorScale(d.properties[inputAttribute])
+      );
+
+      const isActive = d3.select(this).classed("active");
+
+      d3.select(this).classed("active", !isActive);
+
+      if (
+        !selectedCategories.includes(this.id) &&
+        selectedCategories.length <= 5
+      ) {
+        selectedCategories.push(this.id);
+      } else {
+        selectedCategories = selectedCategories.filter((d) => {
+          return d !== this.id;
+        });
+      }
+      // Trigger filter event and pass array with the selected country name
+      vis.dispatcher.call("selectMap", event, selectedCategories);
     });
   }
 }
