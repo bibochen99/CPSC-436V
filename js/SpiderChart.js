@@ -165,7 +165,7 @@ class SpiderChart {
 
   renderVis() {
     let vis = this;
-
+    d3.selectAll("polygon-areas").remove();
     // builds out the levels of the spiderweb
     for (var level = 0; level < vis.config.levels; level++) {
       let levelFactor = vis.radius * ((level + 1) / vis.config.levels);

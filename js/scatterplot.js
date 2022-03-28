@@ -126,19 +126,13 @@ class Scatterplot {
           .attr('stroke','blue')
           .attr('fill','lightblue')
           .classed("selected", d => {
-            if(d.select == true){
+            if(d.display == true){
               return true;
             }else{
               return false;
             }
           });
 
-      let selectedCountry = [];
-      vis.data.forEach((d) => {
-        if(d.select){
-          selectedCountry.push(d["Country name"]);
-        }
-      })
       // Tooltip event listeners
       circles
           .on('mouseover', (event,d) => {
@@ -154,14 +148,20 @@ class Scatterplot {
               `);
           })
           .on('click', function(event, d) {
-            if (!d.select) {
+            let selectedCountry = [];
+            if (!d.display) {
               d3.select(this).classed('selected', true);
-              d.select = true;
-              selectedCountry.push(d["Country name"]);
+              d.display = true;
             } else {
               d3.select(this).classed('selected', false);
-              d.select = false;
+              d.display = false;
+              selectedCountry = [];
             }
+            vis.data.forEach((d) => {
+              if(d.display){
+                selectedCountry.push(d["Country name"]);
+              }
+            })
             vis.dispatcher.call('selectedCountry',event,selectedCountry);
           })
           .on('mouseleave', () => {
