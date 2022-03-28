@@ -125,8 +125,8 @@ d3.select("#clear").on("click", function (event, d) {
   });
   let currStep = data[0]["stepNumber"];
   // choroplethMap.cleared = 1;
-  // choroplethMap.goToStep(currStep);
-  choroplethMap.step0();
+  choroplethMap.goToStep(currStep);
+  // choroplethMap.step0();
   scatterplot.updateVis();
   spiderChart.updateVis();
   smiley.updateVis();
@@ -142,7 +142,7 @@ d3.select("#filterScatter").on("change", function(d) {
 dispatcher.on("timeline", selectedYear => {
   choroplethMap.currYear = selectedYear;
   let currStep = data[0]["stepNumber"];
-  // console.log(currStep);
+  choroplethMap.filterData();
   choroplethMap.goToStep(currStep);
   spiderChart.currYear = selectedYear;
   spiderChart.updateVis();
