@@ -276,7 +276,7 @@ pre {
 
 #desc{
   display: block;
-  position: relative;
+  position: fixed;
   width: 210px;
   transform: translate(0,50px);
   text-align: left;
