@@ -66,7 +66,7 @@ class SpiderChart {
     vis.chart = vis.chartArea.append('g');
 
     // update vis parameters
-    vis.allAxis = ["Social support", "Freedom to make life choices", 
+    vis.allAxis = ["Social support", "Freedom", 
     "Perceptions of corruption", "Positive affect", "Negative affect"];
     vis.totalAxes = vis.allAxis.length;
     vis.radius = Math.min(vis.width / 2, vis.height / 2);
@@ -106,6 +106,14 @@ class SpiderChart {
       .attr("width", vis.config.containerWidth / 2)
       .attr("transform", "translate(" + 0 + ", " + 1.1 * vis.config.containerHeight + ")");
 
+    vis.svg.append('text')
+      .attr('class', 'axis-title')
+      .attr('x', 0)
+      .attr('y', 0)
+      .attr('dy', '.71em')
+      .style("font-size", "15px")
+      .text('Attribute:');
+
     vis.renderStatic();
     vis.updateVis();
   }
@@ -141,7 +149,7 @@ class SpiderChart {
             value: record["Social support"]
           });
           d.axes.push({
-            axis: "Freedom to make life choices",
+            axis: "Freedom",
             value: record["Freedom to make life choices"]
           });
           d.axes.push({
