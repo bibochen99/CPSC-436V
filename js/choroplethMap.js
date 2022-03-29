@@ -59,7 +59,7 @@ class ChoroplethMap {
       .attr("height", vis.config.containerHeight)
       .attr(
         "transform",
-        `translate(0,-220)`
+        `translate(0,-60)`
       );;
 
     // Append group element that will contain our actual chart
