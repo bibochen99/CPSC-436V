@@ -73,17 +73,27 @@ class Scatterplot {
       vis.xLabel = vis.chart.append('text')
           .attr('class', 'axis-title')
           .attr('y', vis.height - 15)
-          .attr('x', vis.width + 10)
+          .attr('x', vis.width + 5)
           .attr('dy', '.71em')
+          .style("font-size", "12px")
           .style('text-anchor', 'end')
           .text(vis.xAttr);
   
       vis.svg.append('text')
           .attr('class', 'axis-title')
           .attr('x', 0)
-          .attr('y', 0)
+          .attr('y', 10)
           .attr('dy', '.71em')
+          .style("font-size", "12px")
           .text('Life Ladders');
+
+      vis.title = vis.svg.append('text')
+          .attr('class', 'axis-title')
+          .attr('x', vis.width/2-50)
+          .attr('y', 1)
+          .attr('dy', '.71em')
+          .style("font-size", "15px")
+          .text('Life Ladders correlation');
     }
   
     /**
