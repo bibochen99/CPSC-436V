@@ -12,7 +12,16 @@
     <link rel="stylesheet" href="//code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css">
   </head>
   <body>
-    <h1 id="map-h1">World Map</h1>
+    <h1 id="map-h1">Happiness report</h1>
+    <div id = "desc">
+      <p>
+        This is the world happiness report. You can choose countries that interest 
+        you from the world map, and then you can view their specific attributes by scrolling the webpage. 
+        After that, you can also discover the correlation of each attribute with its happiness level.
+
+      </p>
+
+    </div>
     <div id="mapWidgets">
       <div id="year-slider"></div>
       <input id="mapSearch" type="text" name="" placeholder="Search for a country">
@@ -42,7 +51,7 @@
       </div>
       <div class="smiley"><svg id="smiley"></svg></div>
     </div>
-
+    
     <script src="js/d3.v6.min.js"></script>
     <script src="https://unpkg.com/d3-simple-slider"></script>
     <script src="js/topojson.v3.js"></script>

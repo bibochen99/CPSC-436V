@@ -8,8 +8,8 @@ class ChoroplethMap {
     this.config = {
       parentElement: _config.parentElement,
       containerWidth: _config.containerWidth || 900,
-      containerHeight: _config.containerHeight || 300,
-      margin: _config.margin || { top: 100, right: 20, bottom: 20, left: 20 },
+      containerHeight: _config.containerHeight || 400,
+      margin: _config.margin || { top: 100, right: 20, bottom: 10, left: 20 },
       tooltipPadding: 10,
       legendBottom: 50,
       legendLeft: 50,
@@ -56,7 +56,11 @@ class ChoroplethMap {
       .select(vis.config.parentElement)
       .append("svg")
       .attr("width", vis.config.containerWidth)
-      .attr("height", vis.config.containerHeight);
+      .attr("height", vis.config.containerHeight)
+      .attr(
+        "transform",
+        `translate(0,-220)`
+      );;
 
     // Append group element that will contain our actual chart
     // and position it according to the given margin config
@@ -77,7 +81,6 @@ class ChoroplethMap {
     vis.geoPath = d3.geoPath().projection(vis.projection);
 
     // Initialize color scale
-    // vis.colorScale = d3.scaleOrdinal().range(["#d3eecd", "#7bc77e", "#2a8d46"]); // light green to dark green
     vis.colorScale = d3
       .scaleLinear()
       .range(["#cfe2f2", "#0d306b"])
@@ -134,8 +137,6 @@ class ChoroplethMap {
       .on("onchange", (val) => {
         let selectedYear = d3.timeFormat("%Y")(val);
         d3.select("p#value-time").text(d3.timeFormat("%Y")(val));
-        // vis.config.currYear = selectedYear;
-        // vis.step0();
         vis.dispatcher.call("timeline", event, selectedYear, vis.currStep);
       });
 
@@ -146,9 +147,6 @@ class ChoroplethMap {
       .append("g")
       .attr("transform", "translate(30,30)")
       .call(vis.yearSlider);
-
-    // Label for current year
-    // d3.select('p#value-time').text(d3.timeFormat('%Y')(vis.yearSlider.value()));
 
     // call step 0
     vis.step0();
