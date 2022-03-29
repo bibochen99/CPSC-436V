@@ -155,6 +155,9 @@ class Scatterplot {
                 <ul>
                   <li>Life Ladder: ${d["Life Ladder"]} </li>
                 </ul>
+                <ul>
+                <l1>${vis.xAttr}: ${d[vis.xAttr]} </li>
+                </ul>
               `);
           })
           .on('click', function(event, d) {
