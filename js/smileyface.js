@@ -5,7 +5,8 @@ class Smileyface {
       parentElement: _config.parentElement,
       containerWidth: _config.containerWidth || 500,
       containerHeight: _config.containerHeight || 300,
-      margin: _config.margin || {top: 25, right: 20, bottom: 20, left: 20}
+      margin: _config.margin || {top: 25, right: 20, bottom: 20, left: 20},
+      colors: d3.scaleOrdinal(d3.schemeCategory10)
     }
     this.Data = _data;
     this.currYear = _year;
@@ -57,10 +58,10 @@ class Smileyface {
           .attr("y1", "0%")
           .attr("y2", "0%");
         if((life - 2) >= 0){
-          grad.append("stop").attr("offset", 1).style("stop-color", "lightblue");
+          grad.append("stop").attr("offset", 1).style("stop-color", vis.config.colors(j));
           grad.append("stop").attr("offset", 0).style("stop-color", "white");
         }else{
-          grad.append("stop").attr("offset", life/2).style("stop-color", "lightblue");
+          grad.append("stop").attr("offset", life/2).style("stop-color", vis.config.colors(j));
           grad.append("stop").attr("offset", 0).style("stop-color", "white");
         }
         // console.log(life);
