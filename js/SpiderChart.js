@@ -252,21 +252,6 @@ class SpiderChart {
         .attr("cx", function(d, i) { return d.coordinates.x; })
         .attr("cy", function(d, i) { return d.coordinates.y; })
         .attr("fill", vis.config.colors(g))
-        .on("mouseover", (event,d) => {
-          let name = d.group;
-          let ladder = d.socialSupport ? d.socialSupport : "N/A";
-          d3.select('#spider-tooltip')
-            .style('display', 'block')
-            .style('left', (event.pageX + vis.config.tooltipPadding) + 'px')   
-            .style('top', (event.pageY + vis.config.tooltipPadding) + 'px')
-            .html(`
-              <div class="tooltip-title">${name}</div>
-              <div>${ladder}</div>
-            `);
-        })
-        .on("mouseleave", () => {
-          d3.select('#spider-tooltip').style('display', 'none');
-        });
     });
 
     // builds out the polygon areas of the dataset
