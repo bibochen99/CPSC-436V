@@ -41,6 +41,7 @@ class ChoroplethMap {
    */
   initVis() {
     let vis = this;
+    vis.isClickedOnMap = false;
     // Calculate inner chart size. Margin specifies the space around the actual chart.
     vis.width =
       vis.config.containerWidth -
@@ -57,10 +58,7 @@ class ChoroplethMap {
       .append("svg")
       .attr("width", vis.config.containerWidth)
       .attr("height", vis.config.containerHeight)
-      .attr(
-        "transform",
-        `translate(0,-60)`
-      );;
+      .attr("transform", `translate(0,-60)`);
 
     // Append group element that will contain our actual chart
     // and position it according to the given margin config
@@ -221,27 +219,7 @@ class ChoroplethMap {
     ];
 
     // Append world map
-    vis.geoJoinPath
-      .transition()
-      .attr("class", (d) => {
-        if (d.properties.lifeLadder === undefined) {
-          return "geo-path disabled";
-        } else {
-          return "geo-path";
-        }
-      })
-      .attr("id", (d) => d.properties.name)
-      .attr("d", vis.geoPath)
-      .attr("fill", (d) => {
-        if (d.properties.isMax == 1) {
-          return "#F4CF49";
-        } else if (d.properties.isMin == 1) {
-          return "#F8E6A5";
-        } else {
-          return vis.colorScale(d.properties.lifeLadder);
-        }
-      });
-
+    this.worldAppendMapHelper(vis, "lifeLadder");
     //tooltip
     vis.geoJoinPath
       .on("mousemove", (event, d) => {
@@ -285,8 +263,10 @@ class ChoroplethMap {
 
     //static dispatcher
     this.staticDispatcherHelper("Life Ladder", vis, min, max, 0);
+    if (vis.isClickedOnMap === false) {
+      this.dispatcherHelper("lifeLadder", vis);
+    }
     //call dispatcherHelper
-    this.dispatcherHelper("lifeLadder", vis);
   }
 
   step1() {
@@ -294,7 +274,7 @@ class ChoroplethMap {
     vis.currStep = 1;
     // update title
     vis.legendTitle.text("Social Support");
-
+    console.log("s1");
     // update map value
     vis.mapValue = d3.extent(
       vis.geoData.objects.world_countries.geometries,
@@ -315,25 +295,7 @@ class ChoroplethMap {
     ];
 
     // Append world map
-    vis.geoJoinPath
-      .transition()
-      .attr("class", (d) => {
-        if (d.properties.socialSupport === undefined) {
-          return "geo-path disabled";
-        } else {
-          return "geo-path";
-        }
-      })
-      .attr("d", vis.geoPath)
-      .attr("fill", (d) => {
-        if (d.properties.isMax == 1) {
-          return "#F4CF49";
-        } else if (d.properties.isMin == 1) {
-          return "#F8E6A5";
-        } else {
-          return vis.colorScale(d.properties.socialSupport);
-        }
-      });
+    this.worldAppendMapHelper(vis, "socialSupport");
     vis.geoJoinPath
       .on("mousemove", (event, d) => {
         let name = d.properties.name;
@@ -378,7 +340,10 @@ class ChoroplethMap {
     //static dispatcher
     this.staticDispatcherHelper("Social support", vis, min, max, 1);
     //call dispatcherHelper
-    this.dispatcherHelper("socialSupport", vis);
+
+    if (vis.isClickedOnMap === false) {
+      this.dispatcherHelper("socialSupport", vis);
+    }
   }
 
   step2() {
@@ -405,25 +370,8 @@ class ChoroplethMap {
     ];
 
     // Append world map
-    vis.geoJoinPath
-      .transition()
-      .attr("class", (d) => {
-        if (d.properties.gdp === undefined) {
-          return "geo-path disabled";
-        } else {
-          return "geo-path";
-        }
-      })
-      .attr("d", vis.geoPath)
-      .attr("fill", (d) => {
-        if (d.properties.isMax == 1) {
-          return "#F4CF49";
-        } else if (d.properties.isMin == 1) {
-          return "#F8E6A5";
-        } else {
-          return vis.colorScale(d.properties.gdp);
-        }
-      });
+    this.worldAppendMapHelper(vis, "gdp");
+    
     vis.geoJoinPath
       .on("mousemove", (event, d) => {
         let name = d.properties.name;
@@ -495,25 +443,7 @@ class ChoroplethMap {
     ];
 
     // Append world map
-    vis.geoJoinPath
-      .transition()
-      .attr("class", (d) => {
-        if (d.properties.healthyLife === undefined) {
-          return "geo-path disabled";
-        } else {
-          return "geo-path";
-        }
-      })
-      .attr("d", vis.geoPath)
-      .attr("fill", (d) => {
-        if (d.properties.isMax == 1) {
-          return "#F4CF49";
-        } else if (d.properties.isMin == 1) {
-          return "#F8E6A5";
-        } else {
-          return vis.colorScale(d.properties.healthyLife);
-        }
-      });
+    this.worldAppendMapHelper(vis, "healthyLife");
     vis.geoJoinPath
       .on("mousemove", (event, d) => {
         let name = d.properties.name;
@@ -558,7 +488,8 @@ class ChoroplethMap {
       "Healthy life expectancy at birth",
       vis,
       min,
-      max,3
+      max,
+      3
     );
     //call dispatcherHelper
     this.dispatcherHelper("healthyLife", vis);
@@ -590,25 +521,7 @@ class ChoroplethMap {
     ];
 
     // Append world map
-    vis.geoJoinPath
-      .transition()
-      .attr("class", (d) => {
-        if (d.properties.free === undefined) {
-          return "geo-path disabled";
-        } else {
-          return "geo-path";
-        }
-      })
-      .attr("d", vis.geoPath)
-      .attr("fill", (d) => {
-        if (d.properties.isMax == 1) {
-          return "#F4CF49";
-        } else if (d.properties.isMin == 1) {
-          return "#F8E6A5";
-        } else {
-          return vis.colorScale(d.properties.free);
-        }
-      });
+    this.worldAppendMapHelper(vis, "free");
 
     vis.geoJoinPath
       .on("mousemove", (event, d) => {
@@ -648,7 +561,13 @@ class ChoroplethMap {
       .attr("offset", (d) => d.offset)
       .attr("stop-color", (d) => d.color);
     //static dispatcher
-    this.staticDispatcherHelper("Freedom to make life choices", vis, min, max,4);
+    this.staticDispatcherHelper(
+      "Freedom to make life choices",
+      vis,
+      min,
+      max,
+      4
+    );
     //call dispatcherHelper
     this.dispatcherHelper("free", vis);
   }
@@ -679,25 +598,7 @@ class ChoroplethMap {
     ];
 
     // Append world map
-    vis.geoJoinPath
-      .transition()
-      .attr("d", vis.geoPath)
-      .attr("class", (d) => {
-        if (d.properties.perceptions === undefined) {
-          return "geo-path disabled";
-        } else {
-          return "geo-path";
-        }
-      })
-      .attr("fill", (d) => {
-        if (d.properties.isMax == 1) {
-          return "#F4CF49";
-        } else if (d.properties.isMin == 1) {
-          return "#F8E6A5";
-        } else {
-          return vis.colorScale(d.properties.perceptions);
-        }
-      });
+    this.worldAppendMapHelper(vis, "perceptions");
     vis.geoJoinPath
       .on("mousemove", (event, d) => {
         let name = d.properties.name;
@@ -741,7 +642,7 @@ class ChoroplethMap {
       .attr("offset", (d) => d.offset)
       .attr("stop-color", (d) => d.color);
     //static dispatcher
-    this.staticDispatcherHelper("Perceptions of corruption", vis, min, max,5);
+    this.staticDispatcherHelper("Perceptions of corruption", vis, min, max, 5);
 
     //call dispatcherHelper
     this.dispatcherHelper("perceptions", vis);
@@ -771,25 +672,8 @@ class ChoroplethMap {
     ];
 
     // Append world map
-    vis.geoJoinPath
-      .transition()
-      .attr("class", (d) => {
-        if (d.properties.positive === undefined) {
-          return "geo-path disabled";
-        } else {
-          return "geo-path";
-        }
-      })
-      .attr("d", vis.geoPath)
-      .attr("fill", (d) => {
-        if (d.properties.isMax == 1) {
-          return "#F4CF49";
-        } else if (d.properties.isMin == 1) {
-          return "#F8E6A5";
-        } else {
-          return vis.colorScale(d.properties.positive);
-        }
-      });
+    this.worldAppendMapHelper(vis, "positive");
+
     vis.geoJoinPath
       .on("mousemove", (event, d) => {
         let name = d.properties.name;
@@ -828,7 +712,7 @@ class ChoroplethMap {
       .attr("offset", (d) => d.offset)
       .attr("stop-color", (d) => d.color);
     //static dispatcher
-    this.staticDispatcherHelper("Positive affect", vis, min, max,6);
+    this.staticDispatcherHelper("Positive affect", vis, min, max, 6);
     //call dispatcherHelper
     this.dispatcherHelper("positive", vis);
   }
@@ -853,25 +737,8 @@ class ChoroplethMap {
       { color: "#0d306b", value: max, offset: 100 },
     ];
     // Append world map
-    vis.geoJoinPath
-      .transition()
-      .attr("class", (d) => {
-        if (d.properties.negative === undefined) {
-          return "geo-path disabled";
-        } else {
-          return "geo-path";
-        }
-      })
-      .attr("d", vis.geoPath)
-      .attr("fill", (d) => {
-        if (d.properties.isMax == 1) {
-          return "#F4CF49";
-        } else if (d.properties.isMin == 1) {
-          return "#F8E6A5";
-        } else {
-          return vis.colorScale(d.properties.negative);
-        }
-      });
+    this.worldAppendMapHelper(vis, "negative");
+    
     vis.geoJoinPath
       .on("mousemove", (event, d) => {
         let name = d.properties.name;
@@ -910,7 +777,7 @@ class ChoroplethMap {
       .attr("offset", (d) => d.offset)
       .attr("stop-color", (d) => d.color);
     //static dispatcher
-    this.staticDispatcherHelper("Negative affect", vis, min, max,7);
+    this.staticDispatcherHelper("Negative affect", vis, min, max, 7);
     //call dispatcherHelper
     this.dispatcherHelper("negative", vis);
   }
@@ -935,25 +802,7 @@ class ChoroplethMap {
       { color: "#0d306b", value: max, offset: 100 },
     ];
     // Append world map
-    vis.geoJoinPath
-      .transition()
-      .attr("class", (d) => {
-        if (d.properties.generosity === undefined) {
-          return "geo-path disabled";
-        } else {
-          return "geo-path";
-        }
-      })
-      .attr("d", vis.geoPath)
-      .attr("fill", (d) => {
-        if (d.properties.isMax == 1) {
-          return "#F4CF49";
-        } else if (d.properties.isMin == 1) {
-          return "#F8E6A5";
-        } else {
-          return vis.colorScale(d.properties.generosity);
-        }
-      });
+    this.worldAppendMapHelper(vis, "generosity");
     vis.geoJoinPath
       .on("mousemove", (event, d) => {
         let name = d.properties.name;
@@ -994,7 +843,7 @@ class ChoroplethMap {
       .attr("offset", (d) => d.offset)
       .attr("stop-color", (d) => d.color);
     //static dispatcher
-    this.staticDispatcherHelper("Generosity", vis, min, max,8);
+    this.staticDispatcherHelper("Generosity", vis, min, max, 8);
     //call dispatcherHelper
     this.dispatcherHelper("generosity", vis);
   }
@@ -1010,10 +859,7 @@ class ChoroplethMap {
     });
 
     vis.geoData.objects.world_countries.geometries.forEach((d) => {
-      if (
-        d.properties[input] == max &&
-        d.properties.year == vis.currYear
-      ) {
+      if (d.properties[input] == max && d.properties.year == vis.currYear) {
         d.properties.isMax = 1;
       } else if (
         d.properties[input] == min &&
@@ -1039,6 +885,18 @@ class ChoroplethMap {
       const isActive = d3.select(this).classed("active");
 
       d3.select(this).classed("active", !isActive);
+
+      vis.geoData.objects.world_countries.geometries.forEach((d) => {
+        if (d.properties.name == this.id) {
+          if (d.properties.mapIsClicked == 1) {
+            d.properties.mapIsClicked = 0;
+            vis.isClickedOnMap = false;
+          } else {
+            d.properties.mapIsClicked = 1;
+            vis.isClickedOnMap = true;
+          }
+        }
+      });
 
       if (
         !selectedCountries.includes(this.id) &&
@@ -1079,5 +937,36 @@ class ChoroplethMap {
       }
     });
     vis.dispatcher.call("staticMap", attrName, vis.data);
+  }
+
+  worldAppendMapHelper(vis, attrName) {
+    vis.geoJoinPath
+      .transition()
+      .attr("class", (d) => {
+        if (d.properties[attrName] === undefined) {
+          return "geo-path disabled";
+        } else {
+          return "geo-path";
+        }
+      })
+      .attr("id", (d) => d.properties.name)
+      .attr("d", vis.geoPath)
+      .attr("fill", (d) => {
+        if (vis.isClickedOnMap == true) {
+          if (d.properties.mapIsClicked == 1) {
+            return "#F4CF49";
+          } else {
+            return vis.colorScale(d.properties[attrName]);
+          }
+        } else {
+          if (d.properties.isMax == 1) {
+            return "#F4CF49";
+          } else if (d.properties.isMin == 1) {
+            return "#F8E6A5";
+          } else {
+            return vis.colorScale(d.properties[attrName]);
+          }
+        }
+      });
   }
 }

@@ -264,7 +264,7 @@ pre {
 }
 
 .geo-path.active {
-  fill: darkgoldenrod;
+  fill: #F4CF49;
   opacity: 1;
 }
 .disabled {
