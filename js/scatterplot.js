@@ -161,6 +161,7 @@ class Scatterplot {
               `);
           })
           .on('click', function(event, d) {
+            console.log(this);
             let selectedCountry = [];
             if (!d.display) {
               d3.select(this).classed('selected', true);
