@@ -4,7 +4,7 @@ class ChoroplethMap {
    * @param {Object}
    * @param {Array}
    */
-  constructor(_config, _geoData, _data, _dispatcher, _currYear,_clicked) {
+  constructor(_config, _geoData, _data, _dispatcher, _currYear, _clicked) {
     this.config = {
       parentElement: _config.parentElement,
       containerWidth: _config.containerWidth || 900,
@@ -179,7 +179,6 @@ class ChoroplethMap {
           // }
         }
       }
-
     });
   }
 
@@ -373,7 +372,7 @@ class ChoroplethMap {
 
     // Append world map
     this.worldAppendMapHelper(vis, "gdp");
-    
+
     vis.geoJoinPath
       .on("mousemove", (event, d) => {
         let name = d.properties.name;
@@ -415,7 +414,9 @@ class ChoroplethMap {
     //static dispatcher
     this.staticDispatcherHelper("Log GDP per capita", vis, min, max, 2);
     //call dispatcherHelper
-    this.dispatcherHelper("gdp", vis);
+    if (vis.isClickedOnMap === false) {
+      this.dispatcherHelper("gdp", vis);
+    }
   }
   step3() {
     let vis = this;
@@ -494,7 +495,10 @@ class ChoroplethMap {
       3
     );
     //call dispatcherHelper
-    this.dispatcherHelper("healthyLife", vis);
+
+    if (vis.isClickedOnMap === false) {
+      this.dispatcherHelper("healthyLife", vis);
+    }
   }
   step4() {
     let vis = this;
@@ -571,7 +575,10 @@ class ChoroplethMap {
       4
     );
     //call dispatcherHelper
-    this.dispatcherHelper("free", vis);
+
+    if (vis.isClickedOnMap === false) {
+      this.dispatcherHelper("free", vis);
+    }
   }
   step5() {
     let vis = this;
@@ -647,7 +654,10 @@ class ChoroplethMap {
     this.staticDispatcherHelper("Perceptions of corruption", vis, min, max, 5);
 
     //call dispatcherHelper
-    this.dispatcherHelper("perceptions", vis);
+
+    if (vis.isClickedOnMap === false) {
+      this.dispatcherHelper("perceptions", vis);
+    }
   }
   step6() {
     let vis = this;
@@ -716,7 +726,10 @@ class ChoroplethMap {
     //static dispatcher
     this.staticDispatcherHelper("Positive affect", vis, min, max, 6);
     //call dispatcherHelper
-    this.dispatcherHelper("positive", vis);
+
+    if (vis.isClickedOnMap === false) {
+      this.dispatcherHelper("positive", vis);
+    }
   }
   step7() {
     let vis = this;
@@ -740,7 +753,7 @@ class ChoroplethMap {
     ];
     // Append world map
     this.worldAppendMapHelper(vis, "negative");
-    
+
     vis.geoJoinPath
       .on("mousemove", (event, d) => {
         let name = d.properties.name;
@@ -781,7 +794,10 @@ class ChoroplethMap {
     //static dispatcher
     this.staticDispatcherHelper("Negative affect", vis, min, max, 7);
     //call dispatcherHelper
-    this.dispatcherHelper("negative", vis);
+
+    if (vis.isClickedOnMap === false) {
+      this.dispatcherHelper("negative", vis);
+    }
   }
   step8() {
     let vis = this;
@@ -847,7 +863,10 @@ class ChoroplethMap {
     //static dispatcher
     this.staticDispatcherHelper("Generosity", vis, min, max, 8);
     //call dispatcherHelper
-    this.dispatcherHelper("generosity", vis);
+
+    if (vis.isClickedOnMap === false) {
+      this.dispatcherHelper("generosity", vis);
+    }
   }
   goToStep(stepIndex) {
     this[this.config.steps[stepIndex]]();
@@ -948,10 +967,10 @@ class ChoroplethMap {
         if (d.properties[attrName] === undefined) {
           return "geo-path disabled";
         } else {
-          if(d.properties.mapIsClicked == 0){
+          if (d.properties.mapIsClicked == 0) {
             return "geo-path";
-          }else{
-            return "geo-path active"
+          } else {
+            return "geo-path active";
           }
         }
       })
@@ -966,12 +985,11 @@ class ChoroplethMap {
           } else {
             return vis.colorScale(d.properties[attrName]);
           }
-        }else{
-          if(d.properties.mapIsClicked == 0){
+        } else {
+          if (d.properties.mapIsClicked == 0) {
             return vis.colorScale(d.properties[attrName]);
           }
         }
       });
-
   }
 }
