@@ -25,6 +25,7 @@ class Scatterplot {
      */
     initVis() {
       let vis = this;
+      vis.click = false;
   
       // Calculate inner chart size. Margin specifies the space around the actual chart.
       vis.width = vis.config.containerWidth - vis.config.margin.left - vis.config.margin.right;
@@ -161,6 +162,12 @@ class Scatterplot {
               `);
           })
           .on('click', function(event, d) {
+            if(vis.click == false){
+              vis.click = true;
+              data.forEach((d) =>{
+                d.display = false;
+              })
+            }
             let selectedCountry = [];
             if (!d.display) {
               d3.select(this).classed('selected', true);
@@ -170,6 +177,7 @@ class Scatterplot {
               d.display = false;
               selectedCountry = [];
             }
+
             vis.data.forEach((d) => {
               if(d.display){
                 selectedCountry.push(d["Country name"]);
