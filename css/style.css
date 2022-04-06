@@ -28,7 +28,7 @@ body {
   margin-top: 150px;
 }
 #map-h1 {
-  margin-left: 15%;
+  margin-left: 0%;
   width: 800px;
   position: fixed;
   display: inline-block;
@@ -45,6 +45,7 @@ body {
 #scatterplot {
   position: fixed;
   width: 500px;
+  top: 65%;
 }
 .geo-path:hover {
   stroke: #333;
@@ -76,6 +77,7 @@ body {
   position: fixed;
   width: 300px;
   margin-top: 27%;
+  top:10%;
 }
 
 .scatterplot {
@@ -129,7 +131,8 @@ body {
   margin-left: 28%;
   padding-right: 50px;
   background-color: #fff;
-  z-index:10;
+  top: 5%;
+  z-index:1;
 }
 
 #mapSearch {
@@ -160,7 +163,7 @@ body {
 #smiley {
   position: fixed;
   display: block;
-  top: 55%;
+  top: 60%;
   left: 43%;
   /* max-height: 105px; */
   /* overflow-y: hidden; */
@@ -235,17 +238,14 @@ pre {
   stroke: red;
   stroke-width: 1px;
 }
-
 .axis-lines {
   stroke: blue;
   stroke-width: 2px;
 }
-
 .axis-labels {
   fill: blue;
   font-size: 12px;
 }
-
 .polygon-vertices {
   fill-opacity: 0.6;
 }
@@ -261,7 +261,7 @@ pre {
 }
 
 .geo-path.active {
-  fill: darkgoldenrod;
+  fill: #F4CF49;
   opacity: 1;
 }
 .disabled {
@@ -269,4 +269,12 @@ pre {
 }
 .ui-autocomplete {
   position: fixed !important;
+}
+
+#desc{
+  display: block;
+  position: fixed;
+  width: 210px;
+  transform: translate(0,50px);
+  text-align: left;
 }
