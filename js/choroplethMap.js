@@ -178,6 +178,7 @@ class ChoroplethMap {
           // }
         }
       }
+
     });
   }
 
@@ -909,7 +910,7 @@ class ChoroplethMap {
         });
       }
       // Trigger filter event and pass array with the selected country name
-      vis.dispatcher.call("selectMap", event, selectedCountries);
+      vis.dispatcher.call("selectedCountry", event, selectedCountries);
     });
   }
 
