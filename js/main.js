@@ -186,8 +186,11 @@ dispatcher.on("timeline", (selectedYear) => {
  * Dispatcher waits for 'selectedCountry' event
  *  filter data based on the selected categories and update the plot
  */
-dispatcher.on("selectedCountry", (selectedCountry) => {
+dispatcher.on("selectedCountry", (selectedCountry, newData) => {
+  // console.log(newData);
+
   data.forEach((d) => {
+    console.log(d.isSelectedFromMap);
     if (selectedCountry.includes(d["Country name"])) {
       d.display = true;
     } else {
@@ -196,17 +199,16 @@ dispatcher.on("selectedCountry", (selectedCountry) => {
   });
 
   choroplethMap.filterData();
-  choroplethMap.geoData.objects.world_countries.geometries.forEach((d) =>{
-    if(selectedCountry.includes(d.properties.name)){
+  choroplethMap.geoData.objects.world_countries.geometries.forEach((d) => {
+    if (selectedCountry.includes(d.properties.name)) {
       d.properties.mapIsClicked = 1;
-    }else{
+    } else {
       d.properties.mapIsClicked = 0;
     }
-  })
+  });
   choroplethMap.isClickedOnMap = true;
-  choroplethMap.worldAppendMapHelper(choroplethMap,"gdp");
+  choroplethMap.worldAppendMapHelper(choroplethMap, "gdp");
 
-  
   scatterplot.data = data;
   scatterplot.updateVis();
   spiderChart.data = data;
@@ -242,7 +244,9 @@ dispatcher.on("selectedCountry", (selectedCountry) => {
 
 dispatcher.on("staticMap", (newData) => {
   newData.forEach((d) => {
-    if (d.min || d.max) {
+    if (d.isSelectedFromMap == 1) {
+      d.display = true;
+    } else if (d.min == 1 || d.max == 1) {
       d.display = true;
     } else {
       d.display = false;

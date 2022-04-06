@@ -919,6 +919,14 @@ class ChoroplethMap {
         }
       });
 
+      vis.data.forEach((d) => {
+        if (d["Country name"] == this.id) {
+          d.isSelectedFromMap = 1;
+        } else {
+          d.isSelectedFromMap = 0;
+        }
+      });
+
       if (
         !selectedCountries.includes(this.id) &&
         selectedCountries.length <= 5
@@ -930,33 +938,41 @@ class ChoroplethMap {
         });
       }
       // Trigger filter event and pass array with the selected country name
-      vis.dispatcher.call("selectedCountry", event, selectedCountries);
+      vis.dispatcher.call("selectedCountry", event, selectedCountries,vis.data);
     });
   }
 
   // helper function for map dispatcher
   staticDispatcherHelper(attrName, vis, min, max, stepNumber) {
-    let year = vis.currYear;
+    console.log(vis.isClickedOnMap);
+    if (vis.isClickedOnMap === true) {
+      vis.data.forEach((d) => {
+        d.max = -1;
+        d.min = -1;
+      });
+    } else {
+      let year = vis.currYear;
 
-    vis.data.forEach((d) => {
-      d["stepNumber"] = -1;
-      d["stepNumber"] = stepNumber;
-      if (d.year == year) {
-        if (d[attrName] == max) {
-          d.max = 1;
+      vis.data.forEach((d) => {
+        d["stepNumber"] = -1;
+        d["stepNumber"] = stepNumber;
+        if (d.year == year) {
+          if (d[attrName] == max) {
+            d.max = 1;
+          } else {
+            d.max = 0;
+          }
+          if (d[attrName] == min) {
+            d.min = 1;
+          } else {
+            d.min = 0;
+          }
         } else {
           d.max = 0;
-        }
-        if (d[attrName] == min) {
-          d.min = 1;
-        } else {
           d.min = 0;
         }
-      } else {
-        d.max = 0;
-        d.min = 0;
-      }
-    });
+      });
+    }
     vis.dispatcher.call("staticMap", attrName, vis.data);
   }
 
