@@ -4,7 +4,7 @@ class ChoroplethMap {
    * @param {Object}
    * @param {Array}
    */
-  constructor(_config, _geoData, _data, _dispatcher, _currYear) {
+  constructor(_config, _geoData, _data, _dispatcher, _currYear,_clicked) {
     this.config = {
       parentElement: _config.parentElement,
       containerWidth: _config.containerWidth || 900,
@@ -32,6 +32,7 @@ class ChoroplethMap {
     this.data = _data;
     this.dispatcher = _dispatcher;
     this.currYear = _currYear;
+    this.isClickedOnMap = _clicked;
     this.cleared = 0;
     this.initVis();
   }
@@ -41,7 +42,6 @@ class ChoroplethMap {
    */
   initVis() {
     let vis = this;
-    vis.isClickedOnMap = false;
     // Calculate inner chart size. Margin specifies the space around the actual chart.
     vis.width =
       vis.config.containerWidth -
@@ -175,6 +175,7 @@ class ChoroplethMap {
           d.properties.positive = vis.filteredData[i]["Positive affect"];
           d.properties.negative = vis.filteredData[i]["Negative affect"];
           d.properties.generosity = vis.filteredData[i]["Generosity"];
+          d.properties.mapIsClicked = 0;
           // }
         }
       }
@@ -947,19 +948,17 @@ class ChoroplethMap {
         if (d.properties[attrName] === undefined) {
           return "geo-path disabled";
         } else {
-          return "geo-path";
+          if(d.properties.mapIsClicked == 0){
+            return "geo-path";
+          }else{
+            return "geo-path active"
+          }
         }
       })
       .attr("id", (d) => d.properties.name)
       .attr("d", vis.geoPath)
       .attr("fill", (d) => {
-        if (vis.isClickedOnMap == true) {
-          if (d.properties.mapIsClicked == 1) {
-            return "#F4CF49";
-          } else {
-            return vis.colorScale(d.properties[attrName]);
-          }
-        } else {
+        if (vis.isClickedOnMap == false) {
           if (d.properties.isMax == 1) {
             return "#F4CF49";
           } else if (d.properties.isMin == 1) {
@@ -967,7 +966,12 @@ class ChoroplethMap {
           } else {
             return vis.colorScale(d.properties[attrName]);
           }
+        }else{
+          if(d.properties.mapIsClicked == 0){
+            return vis.colorScale(d.properties[attrName]);
+          }
         }
       });
+
   }
 }

@@ -139,7 +139,8 @@ Promise.all([
     geoData,
     data,
     dispatcher,
-    2013
+    2013,
+    false
   );
 });
 
@@ -202,6 +203,8 @@ dispatcher.on("selectedCountry", (selectedCountry) => {
       d.properties.mapIsClicked = 0;
     }
   })
+  choroplethMap.isClickedOnMap = true;
+  choroplethMap.worldAppendMapHelper(choroplethMap,"gdp");
 
   
   scatterplot.data = data;
