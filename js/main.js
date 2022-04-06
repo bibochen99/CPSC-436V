@@ -194,6 +194,18 @@ dispatcher.on("selectedCountry", (selectedCountry) => {
     }
   });
 
+  choroplethMap.filterData();
+  choroplethMap.geoData.objects.world_countries.geometries.forEach((d) =>{
+    if(selectedCountry.includes(d.properties.name)){
+      d.properties.mapIsClicked = 1;
+    }else{
+      d.properties.mapIsClicked = 0;
+    }
+  })
+
+  
+  scatterplot.data = data;
+  scatterplot.updateVis();
   spiderChart.data = data;
   spiderChart.updateVis();
   smiley.Data = data;
@@ -203,22 +215,22 @@ dispatcher.on("selectedCountry", (selectedCountry) => {
  * Dispatcher waits for 'selectMap' event
  *  filter data based on the selected categories and update the plot
  */
-dispatcher.on("selectMap", (selectedCountries) => {
-  data.forEach((d) => {
-    if (selectedCountries.includes(d["Country name"])) {
-      d.display = true;
-    } else {
-      d.display = false;
-    }
-  });
+// dispatcher.on("selectMap", (selectedCountries) => {
+//   data.forEach((d) => {
+//     if (selectedCountries.includes(d["Country name"])) {
+//       d.display = true;
+//     } else {
+//       d.display = false;
+//     }
+//   });
 
-  scatterplot.data = data;
-  scatterplot.updateVis();
-  spiderChart.data = data;
-  spiderChart.updateVis();
-  smiley.Data = data;
-  smiley.updateVis();
-});
+//   scatterplot.data = data;
+//   scatterplot.updateVis();
+//   spiderChart.data = data;
+//   spiderChart.updateVis();
+//   smiley.Data = data;
+//   smiley.updateVis();
+// });
 
 /**
  * Dispatcher waits for 'staticMap' event
