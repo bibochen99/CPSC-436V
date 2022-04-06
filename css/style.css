@@ -238,14 +238,17 @@ pre {
   stroke: red;
   stroke-width: 1px;
 }
+
 .axis-lines {
   stroke: blue;
   stroke-width: 2px;
 }
+
 .axis-labels {
   fill: blue;
   font-size: 12px;
 }
+
 .polygon-vertices {
   fill-opacity: 0.6;
 }
