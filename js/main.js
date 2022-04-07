@@ -209,8 +209,7 @@ dispatcher.on("selectedCountry", (selectedCountry, newData) => {
     }
   });
   choroplethMap.isClickedOnMap = true;
-  let currStep = data[0]["stepNumber"];
-  choroplethMap.worldAppendMapHelper(choroplethMap, stepArray[currStep]);
+  choroplethMap.worldAppendMapHelper(choroplethMap, stepArray[choroplethMap.currStep]);
 
   scatterplot.data = data;
   scatterplot.updateVis();
