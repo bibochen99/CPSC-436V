@@ -7,7 +7,9 @@ const dispatcher = d3.dispatch(
 );
 
 const stepArray = ["lifeLadder","socialSupport","gdp"
-                    ,"healthyLife","free","perceptions","positive","negative","generosity"]
+                    ,"healthyLife","free","perceptions","positive","negative","generosity"];
+
+let allSelectedCountries = [];
 
 /**
  * Load and combine data
@@ -158,6 +160,7 @@ d3.select("#clear").on("click", function (event, d) {
   // choroplethMap.cleared = 1;
   choroplethMap.goToStep(currStep);
   // choroplethMap.step0();
+
   scatterplot.updateVis();
   spiderChart.updateVis();
   smiley.updateVis();
@@ -175,9 +178,19 @@ d3.select("#filterScatter").on("change", function (d) {
  */
 dispatcher.on("timeline", (selectedYear) => {
   choroplethMap.currYear = selectedYear;
-  let currStep = data[0]["stepNumber"];
-  choroplethMap.filterData();
-  choroplethMap.goToStep(currStep);
+  if (choroplethMap.isClickedOnMap === true) {
+    choroplethMap.geoData.objects.world_countries.geometries.forEach((d) => {
+      if (allSelectedCountries.includes(d.properties.name)) {
+        d.properties.mapIsClicked = 1;
+      } else {
+        d.properties.mapIsClicked = 0;
+      }
+    });
+    choroplethMap.worldAppendMapHelper(choroplethMap, stepArray[choroplethMap.currStep]);
+  } else {
+    choroplethMap.filterData();
+    choroplethMap.goToStep(choroplethMap.currStep);
+  }
   spiderChart.currYear = selectedYear;
   spiderChart.updateVis();
   scatterplot.currYear = selectedYear;
@@ -190,6 +203,7 @@ dispatcher.on("timeline", (selectedYear) => {
  *  filter data based on the selected categories and update the plot
  */
 dispatcher.on("selectedCountry", (selectedCountry, newData) => {
+  allSelectedCountries = selectedCountry;
   // console.log(newData);
 
   data.forEach((d) => {
