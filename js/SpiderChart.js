@@ -44,6 +44,8 @@ class SpiderChart {
     // Create SVG area, initialize scales and axes
     let vis = this;
 
+    vis.clicked = false;
+
     // Calculate inner chart size. Margin specifies the space around the actual chart.
     vis.width = vis.config.containerWidth - vis.config.margin.left - vis.config.margin.right;
     vis.height = vis.config.containerHeight - vis.config.margin.top - vis.config.margin.bottom;
