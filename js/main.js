@@ -200,6 +200,7 @@ dispatcher.on("selectedCountry", (selectedCountry, newData) => {
     }
   });
 
+  scatterplot.click = true;
   // choroplethMap.filterData();
   choroplethMap.geoData.objects.world_countries.geometries.forEach((d) => {
     if (selectedCountry.includes(d.properties.name)) {
@@ -254,7 +255,6 @@ dispatcher.on("staticMap", (newData,clicked) => {
       d.display = false;
     }
   });
-  console.log(clicked);
   //scatterplot.click = true;
   scatterplot.data = newData;
   scatterplot.updateVis();
