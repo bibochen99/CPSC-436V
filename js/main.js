@@ -6,6 +6,9 @@ const dispatcher = d3.dispatch(
   "staticMap"
 );
 
+const stepArray = ["lifeLadder","socialSupport","gdp"
+                    ,"healthyLife","free","perceptions","positive","negative","generosity"]
+
 /**
  * Load and combine data
  */
@@ -54,7 +57,7 @@ Promise.all([
       if (e.keyCode == 13) {
         // console.log('pressed enter');
         selectedCountry = $("#mapSearch").val();
-        dispatcher.call("selectMap", event, selectedCountry);
+        dispatcher.call("selectedCountry", event, selectedCountry);
       }
     });
   });
@@ -190,7 +193,6 @@ dispatcher.on("selectedCountry", (selectedCountry, newData) => {
   // console.log(newData);
 
   data.forEach((d) => {
-    console.log(d.isSelectedFromMap);
     if (selectedCountry.includes(d["Country name"])) {
       d.display = true;
     } else {
@@ -198,7 +200,7 @@ dispatcher.on("selectedCountry", (selectedCountry, newData) => {
     }
   });
 
-  choroplethMap.filterData();
+  // choroplethMap.filterData();
   choroplethMap.geoData.objects.world_countries.geometries.forEach((d) => {
     if (selectedCountry.includes(d.properties.name)) {
       d.properties.mapIsClicked = 1;
@@ -207,7 +209,8 @@ dispatcher.on("selectedCountry", (selectedCountry, newData) => {
     }
   });
   choroplethMap.isClickedOnMap = true;
-  choroplethMap.worldAppendMapHelper(choroplethMap, "gdp");
+  let currStep = data[0]["stepNumber"];
+  choroplethMap.worldAppendMapHelper(choroplethMap, stepArray[currStep]);
 
   scatterplot.data = data;
   scatterplot.updateVis();
@@ -242,17 +245,18 @@ dispatcher.on("selectedCountry", (selectedCountry, newData) => {
  *  filter data based on the selected categories and update the plot
  */
 
-dispatcher.on("staticMap", (newData) => {
+dispatcher.on("staticMap", (newData,clicked) => {
   newData.forEach((d) => {
-    if (d.isSelectedFromMap == 1) {
+    if (d.isSelectedFromMap == 1 || d.display == true) {
       d.display = true;
-    } else if (d.min == 1 || d.max == 1) {
+    } else if (!clicked && (d.min == 1 || d.max == 1)) {
       d.display = true;
     } else {
       d.display = false;
     }
   });
-
+  console.log(clicked);
+  //scatterplot.click = true;
   scatterplot.data = newData;
   scatterplot.updateVis();
   spiderChart.data = newData;

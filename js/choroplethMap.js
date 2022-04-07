@@ -146,6 +146,9 @@ class ChoroplethMap {
       .attr("transform", "translate(30,30)")
       .call(vis.yearSlider);
 
+
+    
+    vis.filterData();
     // call step 0
     vis.step0();
   }
@@ -192,7 +195,6 @@ class ChoroplethMap {
       .attr("height", vis.config.legendRectHeight);
     vis.legendTitle.text("Life Ladder");
 
-    vis.filterData();
 
     // update map value to life ladder
     vis.mapValue = d3.extent(
@@ -896,7 +898,6 @@ class ChoroplethMap {
 
   // helper function for map dispatcher
   dispatcherHelper(inputAttribute, vis) {
-    let selectedCountries = [];
     vis.geoJoinPath.on("click", function (event, d) {
       // Check if current category is active and toggle class
       d3.selectAll(".geo-path").attr("fill", (d) =>
@@ -919,24 +920,34 @@ class ChoroplethMap {
         }
       });
 
+      let selectedCountries = [];
+      vis.geoData.objects.world_countries.geometries.forEach((d) => {
+        if (d.properties.mapIsClicked) {
+          selectedCountries.push(d.properties.name);
+        }
+      })
+
+      console.log(selectedCountries);
+
+
+
+      // if (
+      //   !selectedCountries.includes(this.id) &&
+      //   selectedCountries.length <= 5
+      // ) {
+      //   selectedCountries.push(this.id);
+      // } else {
+      //   selectedCountries = selectedCountries.filter((d) => {
+      //     return d !== this.id;
+      //   });
+      //}
       vis.data.forEach((d) => {
-        if (d["Country name"] == this.id) {
+        if (selectedCountries.includes(d["Country name"])) {
           d.isSelectedFromMap = 1;
         } else {
           d.isSelectedFromMap = 0;
         }
       });
-
-      if (
-        !selectedCountries.includes(this.id) &&
-        selectedCountries.length <= 5
-      ) {
-        selectedCountries.push(this.id);
-      } else {
-        selectedCountries = selectedCountries.filter((d) => {
-          return d !== this.id;
-        });
-      }
       // Trigger filter event and pass array with the selected country name
       vis.dispatcher.call("selectedCountry", event, selectedCountries,vis.data);
     });
@@ -973,23 +984,13 @@ class ChoroplethMap {
         }
       });
     }
-    vis.dispatcher.call("staticMap", attrName, vis.data);
+    vis.dispatcher.call("staticMap", attrName, vis.data,vis.isClickedOnMap);
   }
 
   worldAppendMapHelper(vis, attrName) {
+    console.log(vis.isClickedOnMap);
     vis.geoJoinPath
       .transition()
-      .attr("class", (d) => {
-        if (d.properties[attrName] === undefined) {
-          return "geo-path disabled";
-        } else {
-          if (d.properties.mapIsClicked == 0) {
-            return "geo-path";
-          } else {
-            return "geo-path active";
-          }
-        }
-      })
       .attr("id", (d) => d.properties.name)
       .attr("d", vis.geoPath)
       .attr("fill", (d) => {
@@ -1004,6 +1005,17 @@ class ChoroplethMap {
         } else {
           if (d.properties.mapIsClicked == 0) {
             return vis.colorScale(d.properties[attrName]);
+          }
+        }
+      })
+      .attr("class", (d) => {
+        if (d.properties[attrName] === undefined) {
+          return "geo-path disabled";
+        } else {
+          if (d.properties.mapIsClicked == 0) {
+            return "geo-path";
+          } else {
+            return "geo-path active";
           }
         }
       });

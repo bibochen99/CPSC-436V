@@ -103,6 +103,7 @@ class Scatterplot {
     updateVis() {
       let vis = this;
 
+      console.log(vis.click);
       //Filter the data in the given year
       vis.data = vis.Data.filter((d) => {
         return d.year == vis.currYear;
@@ -168,21 +169,23 @@ class Scatterplot {
                 d.display = false;
               })
             }
-            let selectedCountry = [];
+
             if (!d.display) {
               d3.select(this).classed('selected', true);
               d.display = true;
             } else {
               d3.select(this).classed('selected', false);
               d.display = false;
-              selectedCountry = [];
             }
 
+            let selectedCountry = [];
             vis.data.forEach((d) => {
               if(d.display){
                 selectedCountry.push(d["Country name"]);
               }
             })
+            console.log(1);
+            console.log(selectedCountry);
             vis.dispatcher.call('selectedCountry',event,selectedCountry);
           })
           .on('mouseleave', () => {
