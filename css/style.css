@@ -283,3 +283,7 @@ pre {
   transform: translate(0,50px);
   text-align: left;
 }
+
+.axis-x-axis line,.axis-y-axis line {
+  opacity: 0;
+}

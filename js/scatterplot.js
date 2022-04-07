@@ -63,12 +63,12 @@ class Scatterplot {
   
       // Append empty x-axis group and move it to the bottom of the chart
       vis.xAxisG = vis.chart.append('g')
-          .attr('class', 'axis x-axis')
+          .attr('class', 'axis-x-axis')
           .attr('transform', `translate(0,${vis.height})`);
       
       // Append y-axis group
       vis.yAxisG = vis.chart.append('g')
-          .attr('class', 'axis y-axis');
+          .attr('class', 'axis-y-axis');
   
       // Append both axis titles
       vis.xLabel = vis.chart.append('text')
