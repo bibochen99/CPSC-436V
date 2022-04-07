@@ -247,7 +247,7 @@ dispatcher.on("selectedCountry", (selectedCountry, newData) => {
 
 dispatcher.on("staticMap", (newData,clicked) => {
   newData.forEach((d) => {
-    if (d.isSelectedFromMap == 1 || d.display == true) {
+    if (clicked && (d.isSelectedFromMap == 1 || d.display == true)) {
       d.display = true;
     } else if (!clicked && (d.min == 1 || d.max == 1)) {
       d.display = true;
