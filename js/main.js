@@ -6,12 +6,29 @@ const dispatcher = d3.dispatch(
   "staticMap"
 );
 
-const stepArray = ["lifeLadder","socialSupport","gdp"
-                    ,"healthyLife","free","perceptions","positive","negative","generosity"];
+const stepArray = [
+  "lifeLadder",
+  "socialSupport",
+  "gdp",
+  "healthyLife",
+  "free",
+  "perceptions",
+  "positive",
+  "negative",
+  "generosity",
+];
 
-const columnsArray = ["Life Ladder","Social support","Log GDP per capita"
-,"Healthy life expectancy at birth","Freedom to make life choices",
-"Perceptions of corruption","Positive affect","Negative affect","Generosity"];
+const columnsArray = [
+  "Life Ladder",
+  "Social support",
+  "Log GDP per capita",
+  "Healthy life expectancy at birth",
+  "Freedom to make life choices",
+  "Perceptions of corruption",
+  "Positive affect",
+  "Negative affect",
+  "Generosity",
+];
 
 let allSelectedCountries = [];
 
@@ -154,44 +171,49 @@ Promise.all([
 });
 
 // clear button
-d3.select("#clear").on("click", function (event, d) {
-  let year = choroplethMap.currYear;
-  let attrName = columnsArray[choroplethMap.currStep];
-  let yearData = data.filter((d) => {
-    return d.year == year;
-  });
-  let range = d3.extent(yearData, (d) => d[attrName]);
-    let min = range[0],
-      max = range[1];
-  console.log("step" + attrName + "min" + min + "max" + max);
-  data.forEach((d) => {
-    d.display = false;
-    if (d.year == year) {
-      if (d[attrName] == max || d[attrName] == min) {
-        d.display = true;
-      }
-    } else {
-      d.display = false;
-    }
-  });
-  choroplethMap.data = data;
-  choroplethMap.isClickedOnMap = false;
-  choroplethMap.geoData.objects.world_countries.geometries.forEach((d) => {
-    d.properties.mapIsClicked = 0;
-  });
-  choroplethMap.worldAppendMapHelper(choroplethMap, stepArray[choroplethMap.currStep]);
-  // choroplethMap.staticDispatcherHelper(stepArray[choroplethMap.currStep], choroplethMap, min, max, choroplethMap.currStep);
-  console.log("clicked: " + choroplethMap.isClickedOnMap);
+// d3.select("#clear").on("click", function (event, d) {
+//   let year = choroplethMap.currYear;
+//   let attrName = columnsArray[choroplethMap.currStep];
+//   let yearData = data.filter((d) => {
+//     return d.year == year;
+//   });
+//   let range = d3.extent(yearData, (d) => d[attrName]);
+//   let min = range[0],
+//     max = range[1];
+//   console.log("step" + attrName + "min" + min + "max" + max);
+//   data.forEach((d) => {
+//     d.display = false;
+//     if (d.year == year) {
+//       if (d[attrName] == max || d[attrName] == min) {
+//         d.display = true;
+//       } else {
+//         d.display = false;
+//       }
+//     } else {
+//       d.display = false;
+//     }
+//   });
+//   choroplethMap.data = data;
+//   choroplethMap.isClickedOnMap = false;
+//   choroplethMap.geoData.objects.world_countries.geometries.forEach((d) => {
+//     d.properties.mapIsClicked = 0;
+//   });
+//   choroplethMap.worldAppendMapHelper(
+//     choroplethMap,
+//     stepArray[choroplethMap.currStep]
+//   );
+//   // choroplethMap.staticDispatcherHelper(stepArray[choroplethMap.currStep], choroplethMap, min, max, choroplethMap.currStep);
+//   console.log("clicked: " + choroplethMap.isClickedOnMap);
 
-  scatterplot.click = false;
-  scatterplot.data = data;
-  scatterplot.updateVis();
-  spiderChart.clicked = false;
-  spiderChart.data = data;
-  spiderChart.updateVis();
-  smiley.data = data;
-  smiley.updateVis();
-});
+//   scatterplot.click = false;
+//   scatterplot.data = data;
+//   scatterplot.updateVis();
+//   spiderChart.clicked = false;
+//   spiderChart.data = data;
+//   spiderChart.updateVis();
+//   smiley.data = data;
+//   smiley.updateVis();
+// });
 
 d3.select("#filterScatter").on("change", function (d) {
   // recover the option that has been chosen
@@ -213,7 +235,10 @@ dispatcher.on("timeline", (selectedYear) => {
         d.properties.mapIsClicked = 0;
       }
     });
-    choroplethMap.worldAppendMapHelper(choroplethMap, stepArray[choroplethMap.currStep]);
+    choroplethMap.worldAppendMapHelper(
+      choroplethMap,
+      stepArray[choroplethMap.currStep]
+    );
   } else {
     choroplethMap.filterData();
     choroplethMap.goToStep(choroplethMap.currStep);
@@ -251,7 +276,10 @@ dispatcher.on("selectedCountry", (selectedCountry, newData) => {
     }
   });
   choroplethMap.isClickedOnMap = true;
-  choroplethMap.worldAppendMapHelper(choroplethMap, stepArray[choroplethMap.currStep]);
+  choroplethMap.worldAppendMapHelper(
+    choroplethMap,
+    stepArray[choroplethMap.currStep]
+  );
 
   spiderChart.clicked = true;
 
@@ -288,7 +316,7 @@ dispatcher.on("selectedCountry", (selectedCountry, newData) => {
  *  filter data based on the selected categories and update the plot
  */
 
-dispatcher.on("staticMap", (newData,clicked) => {
+dispatcher.on("staticMap", (newData, clicked) => {
   newData.forEach((d) => {
     if (clicked && (d.isSelectedFromMap == 1 || d.display == true)) {
       d.display = true;
