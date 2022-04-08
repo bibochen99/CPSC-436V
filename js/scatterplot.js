@@ -103,7 +103,7 @@ class Scatterplot {
     updateVis() {
       let vis = this;
 
-      console.log(vis.click);
+
       //Filter the data in the given year
       vis.data = vis.Data.filter((d) => {
         return d.year == vis.currYear;

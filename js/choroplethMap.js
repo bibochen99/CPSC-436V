@@ -146,8 +146,6 @@ class ChoroplethMap {
       .attr("transform", "translate(30,30)")
       .call(vis.yearSlider);
 
-
-    
     vis.filterData();
     // call step 0
     vis.step0();
@@ -195,7 +193,6 @@ class ChoroplethMap {
       .attr("height", vis.config.legendRectHeight);
     vis.legendTitle.text("Life Ladder");
 
-
     // update map value to life ladder
     vis.mapValue = d3.extent(
       vis.geoData.objects.world_countries.geometries,
@@ -227,7 +224,12 @@ class ChoroplethMap {
     vis.geoJoinPath
       .on("mousemove", (event, d) => {
         let name = d.properties.name;
-        let ladder = d.properties.lifeLadder ? d.properties.lifeLadder : "N/A";
+        let ladder;
+        if (d.properties.lifeLadder === undefined) {
+          ladder = "N/A";
+        } else {
+          ladder = d.properties.lifeLadder;
+        }
         d3
           .select("#map-tooltip")
           .style("display", "block")
@@ -277,7 +279,7 @@ class ChoroplethMap {
     vis.currStep = 1;
     // update title
     vis.legendTitle.text("Social Support");
-    console.log("s1");
+
     // update map value
     vis.mapValue = d3.extent(
       vis.geoData.objects.world_countries.geometries,
@@ -302,9 +304,14 @@ class ChoroplethMap {
     vis.geoJoinPath
       .on("mousemove", (event, d) => {
         let name = d.properties.name;
-        let socialSupport = d.properties.socialSupport
-          ? d.properties.socialSupport
-          : "N/A";
+
+        let socialSupport;
+        if (d.properties.socialSupport === undefined) {
+          socialSupport = "N/A";
+        } else {
+          socialSupport = d.properties.socialSupport;
+        }
+
         d3
           .select("#map-tooltip")
           .style("display", "block")
@@ -378,7 +385,13 @@ class ChoroplethMap {
     vis.geoJoinPath
       .on("mousemove", (event, d) => {
         let name = d.properties.name;
-        let gdp = d.properties.gdp ? d.properties.gdp : "N/A";
+        let gdp;
+        if (d.properties.gdp === undefined) {
+          gdp = "N/A";
+        } else {
+          gdp = d.properties.gdp;
+        }
+
         d3
           .select("#map-tooltip")
           .style("display", "block")
@@ -452,9 +465,13 @@ class ChoroplethMap {
     vis.geoJoinPath
       .on("mousemove", (event, d) => {
         let name = d.properties.name;
-        let healthyLife = d.properties.healthyLife
-          ? d.properties.healthyLife
-          : "N/A";
+        let healthyLife;
+        if (d.properties.healthyLife === undefined) {
+          healthyLife = "N/A";
+        } else {
+          healthyLife = d.properties.healthyLife;
+        }
+
         d3
           .select("#map-tooltip")
           .style("display", "block")
@@ -534,7 +551,12 @@ class ChoroplethMap {
     vis.geoJoinPath
       .on("mousemove", (event, d) => {
         let name = d.properties.name;
-        let free = d.properties.free ? d.properties.free : "N/A";
+        let free;
+        if (d.properties.free === undefined) {
+          free = "N/A";
+        } else {
+          free = d.properties.free;
+        }
         d3
           .select("#map-tooltip")
           .style("display", "block")
@@ -691,7 +713,14 @@ class ChoroplethMap {
     vis.geoJoinPath
       .on("mousemove", (event, d) => {
         let name = d.properties.name;
-        let positive = d.properties.positive ? d.properties.positive : "N/A";
+
+        let positive;
+        if (d.properties.positive === undefined) {
+          positive = "N/A";
+        } else {
+          positive = d.properties.positive;
+        }
+
         d3
           .select("#map-tooltip")
           .style("display", "block")
@@ -759,7 +788,13 @@ class ChoroplethMap {
     vis.geoJoinPath
       .on("mousemove", (event, d) => {
         let name = d.properties.name;
-        let negative = d.properties.negative ? d.properties.negative : "N/A";
+        let negative;
+        if (d.properties.negative === undefined) {
+          negative = "N/A";
+        } else {
+          negative = d.properties.negative;
+        }
+
         d3
           .select("#map-tooltip")
           .style("display", "block")
@@ -826,9 +861,13 @@ class ChoroplethMap {
     vis.geoJoinPath
       .on("mousemove", (event, d) => {
         let name = d.properties.name;
-        let generosity = d.properties.generosity
-          ? d.properties.generosity
-          : "N/A";
+
+        let generosity;
+        if (d.properties.generosity === undefined) {
+          generosity = "N/A";
+        } else {
+          generosity = d.properties.generosity;
+        }
         d3
           .select("#map-tooltip")
           .style("display", "block")
@@ -925,22 +964,8 @@ class ChoroplethMap {
         if (d.properties.mapIsClicked) {
           selectedCountries.push(d.properties.name);
         }
-      })
+      });
 
-      console.log(selectedCountries);
-
-
-
-      // if (
-      //   !selectedCountries.includes(this.id) &&
-      //   selectedCountries.length <= 5
-      // ) {
-      //   selectedCountries.push(this.id);
-      // } else {
-      //   selectedCountries = selectedCountries.filter((d) => {
-      //     return d !== this.id;
-      //   });
-      //}
       vis.data.forEach((d) => {
         if (selectedCountries.includes(d["Country name"])) {
           d.isSelectedFromMap = 1;
@@ -949,13 +974,17 @@ class ChoroplethMap {
         }
       });
       // Trigger filter event and pass array with the selected country name
-      vis.dispatcher.call("selectedCountry", event, selectedCountries,vis.data);
+      vis.dispatcher.call(
+        "selectedCountry",
+        event,
+        selectedCountries,
+        vis.data
+      );
     });
   }
 
   // helper function for map dispatcher
   staticDispatcherHelper(attrName, vis, min, max, stepNumber) {
-    console.log(vis.isClickedOnMap);
     if (vis.isClickedOnMap === true) {
       vis.data.forEach((d) => {
         d.max = -1;
@@ -984,17 +1013,24 @@ class ChoroplethMap {
         }
       });
     }
-    vis.dispatcher.call("staticMap", attrName, vis.data,vis.isClickedOnMap);
+    vis.dispatcher.call("staticMap", attrName, vis.data, vis.isClickedOnMap);
   }
 
   worldAppendMapHelper(vis, attrName) {
-    console.log(vis.isClickedOnMap);
     vis.geoJoinPath
       .transition()
       .attr("id", (d) => d.properties.name)
       .attr("d", vis.geoPath)
+      .attr("opacity",(d)=>{
+        if (d.properties[attrName] == undefined) {
+          return "0.3";
+        }
+      })
       .attr("fill", (d) => {
-        if (vis.isClickedOnMap == false) {
+        // console.log(d.properties[attrName]);
+        if (d.properties[attrName] == undefined) {
+          return "black";
+        } else if (vis.isClickedOnMap == false) {
           if (d.properties.isMax == 1) {
             return "#F4CF49";
           } else if (d.properties.isMin == 1) {
