@@ -635,7 +635,7 @@ class ChoroplethMap {
     if (!vis.cleared) {
       this.indicatorHelper("perceptions", min, max, vis);
     }
-    console.log(range);
+
     vis.colorScale.domain(vis.mapValue);
     vis.legendStops = [
       { color: "#cfe2f2", value: min, offset: 0 },
@@ -931,7 +931,7 @@ class ChoroplethMap {
       d.properties.isMax = 0;
       d.properties.isMin = 0;
     });
-    console.log(vis.geoData);
+
 
     vis.geoData.objects.world_countries.geometries.forEach((d) => {
       if (d.properties[input] == max && d.properties.year == vis.currYear) {
@@ -1040,7 +1040,7 @@ class ChoroplethMap {
         }
       })
       .attr("fill", (d) => {
-        // console.log(d.properties[attrName]);
+
         if (d.properties[attrName] == undefined) {
           return "black";
         } else if (vis.isClickedOnMap == false) {
