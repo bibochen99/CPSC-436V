@@ -285,6 +285,6 @@ pre {
   text-align: left;
 }
 
-.axis-x-axis line,.axis-y-axis line {
+.axis-x-axis line{
   opacity: 0;
 }
