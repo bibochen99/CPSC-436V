@@ -614,6 +614,7 @@ class ChoroplethMap {
       vis.geoData.objects.world_countries.geometries,
       (d) => d.properties.perceptions
     );
+
     // update range, max & min indicator, helper function, legend value
     let range = d3.extent(
       vis.filteredData,
@@ -621,9 +622,11 @@ class ChoroplethMap {
     );
     let min = range[0],
       max = range[1];
-    if (vis.cleared) {
+
+    if (!vis.cleared) {
       this.indicatorHelper("perceptions", min, max, vis);
     }
+    console.log(range);
     vis.colorScale.domain(vis.mapValue);
     vis.legendStops = [
       { color: "#cfe2f2", value: min, offset: 0 },
@@ -919,6 +922,7 @@ class ChoroplethMap {
       d.properties.isMax = 0;
       d.properties.isMin = 0;
     });
+    console.log(vis.geoData);
 
     vis.geoData.objects.world_countries.geometries.forEach((d) => {
       if (d.properties[input] == max && d.properties.year == vis.currYear) {
@@ -1021,7 +1025,7 @@ class ChoroplethMap {
       .transition()
       .attr("id", (d) => d.properties.name)
       .attr("d", vis.geoPath)
-      .attr("opacity",(d)=>{
+      .attr("opacity", (d) => {
         if (d.properties[attrName] == undefined) {
           return "0.3";
         }
