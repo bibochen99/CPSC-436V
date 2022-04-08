@@ -96,8 +96,7 @@ class ChoroplethMap {
       .attr("class", "legend")
       .attr(
         "transform",
-        `translate(${vis.config.legendLeft},${
-          vis.height - vis.config.legendBottom
+        `translate(${vis.config.legendLeft},${vis.height - vis.config.legendBottom
         })`
       );
 
@@ -160,6 +159,16 @@ class ChoroplethMap {
 
     // combine dataset
     vis.geoData.objects.world_countries.geometries.forEach((d) => {
+      d.properties.year = undefined;
+      d.properties.lifeLadder = undefined;
+      d.properties.socialSupport = undefined;
+      d.properties.gdp = undefined;
+      d.properties.healthyLife = undefined;
+      d.properties.free = undefined;
+      d.properties.perceptions = undefined;
+      d.properties.positive = undefined;
+      d.properties.negative = undefined;
+      d.properties.generosity = undefined;
       for (let i = 0; i < vis.filteredData.length; i++) {
         if (d.properties.name == vis.filteredData[i]["Country name"]) {
           // if (vis.data[i].year === inputYear) {
