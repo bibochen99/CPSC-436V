@@ -78,7 +78,6 @@ Promise.all([
 
     $("#mapSearch").keyup(function (e) {
       if (e.keyCode == 13) {
-        // console.log('pressed enter');
         selectedCountry = $("#mapSearch").val();
         dispatcher.call("selectedCountry", event, selectedCountry);
       }
@@ -170,50 +169,8 @@ Promise.all([
   );
 });
 
-// clear button
-// d3.select("#clear").on("click", function (event, d) {
-//   let year = choroplethMap.currYear;
-//   let attrName = columnsArray[choroplethMap.currStep];
-//   let yearData = data.filter((d) => {
-//     return d.year == year;
-//   });
-//   let range = d3.extent(yearData, (d) => d[attrName]);
-//   let min = range[0],
-//     max = range[1];
-//   console.log("step" + attrName + "min" + min + "max" + max);
-//   data.forEach((d) => {
-//     d.display = false;
-//     if (d.year == year) {
-//       if (d[attrName] == max || d[attrName] == min) {
-//         d.display = true;
-//       } else {
-//         d.display = false;
-//       }
-//     } else {
-//       d.display = false;
-//     }
-//   });
-//   choroplethMap.data = data;
-//   choroplethMap.isClickedOnMap = false;
-//   choroplethMap.geoData.objects.world_countries.geometries.forEach((d) => {
-//     d.properties.mapIsClicked = 0;
-//   });
-//   choroplethMap.worldAppendMapHelper(
-//     choroplethMap,
-//     stepArray[choroplethMap.currStep]
-//   );
-//   // choroplethMap.staticDispatcherHelper(stepArray[choroplethMap.currStep], choroplethMap, min, max, choroplethMap.currStep);
-//   console.log("clicked: " + choroplethMap.isClickedOnMap);
 
-//   scatterplot.click = false;
-//   scatterplot.data = data;
-//   scatterplot.updateVis();
-//   spiderChart.clicked = false;
-//   spiderChart.data = data;
-//   spiderChart.updateVis();
-//   smiley.data = data;
-//   smiley.updateVis();
-// });
+
 
 d3.select("#filterScatter").on("change", function (d) {
   // recover the option that has been chosen
@@ -256,7 +213,6 @@ dispatcher.on("timeline", (selectedYear) => {
  */
 dispatcher.on("selectedCountry", (selectedCountry, newData) => {
   allSelectedCountries = selectedCountry;
-  // console.log(newData);
 
   data.forEach((d) => {
     if (selectedCountry.includes(d["Country name"])) {
@@ -267,7 +223,6 @@ dispatcher.on("selectedCountry", (selectedCountry, newData) => {
   });
 
   scatterplot.click = true;
-  // choroplethMap.filterData();
   choroplethMap.geoData.objects.world_countries.geometries.forEach((d) => {
     if (selectedCountry.includes(d.properties.name)) {
       d.properties.mapIsClicked = 1;
@@ -290,26 +245,6 @@ dispatcher.on("selectedCountry", (selectedCountry, newData) => {
   smiley.Data = data;
   smiley.updateVis();
 });
-/**
- * Dispatcher waits for 'selectMap' event
- *  filter data based on the selected categories and update the plot
- */
-// dispatcher.on("selectMap", (selectedCountries) => {
-//   data.forEach((d) => {
-//     if (selectedCountries.includes(d["Country name"])) {
-//       d.display = true;
-//     } else {
-//       d.display = false;
-//     }
-//   });
-
-//   scatterplot.data = data;
-//   scatterplot.updateVis();
-//   spiderChart.data = data;
-//   spiderChart.updateVis();
-//   smiley.Data = data;
-//   smiley.updateVis();
-// });
 
 /**
  * Dispatcher waits for 'staticMap' event
@@ -326,7 +261,6 @@ dispatcher.on("staticMap", (newData, clicked) => {
       d.display = false;
     }
   });
-  //scatterplot.click = true;
   scatterplot.data = newData;
   scatterplot.updateVis();
   spiderChart.data = newData;
