@@ -15,8 +15,8 @@ This directory contains our .js files for our actual views, including:
 1. `choroplethMap.js`, our code for our world map.
 2. `d3.v6.min.js`, the D3 library.
 3. `main.js`, where we parse our data and initialize our views and widgets.
-4. `noframework.waypoints.in.js`, .
+4. `noframework.waypoints.in.js`, where in order to use waypoint
 5. `scatterplot.js`, our code for our scatter plot.
 6. `smileyface.js`, our code for our smiley face.
 7. `spiderChart.js`, our code for our spider chart.
-8. `topojson.v3.js`, .
+8. `topojson.v3.js`, topo json file for map.
