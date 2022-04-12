@@ -15,7 +15,6 @@ class ChoroplethMap {
       legendLeft: 50,
       legendRectHeight: 12,
       legendRectWidth: 150,
-      // currYear: 2013,
       steps: [
         "step0",
         "step1",
@@ -171,7 +170,6 @@ class ChoroplethMap {
       d.properties.generosity = undefined;
       for (let i = 0; i < vis.filteredData.length; i++) {
         if (d.properties.name == vis.filteredData[i]["Country name"]) {
-          // if (vis.data[i].year === inputYear) {
           d.properties.year = vis.filteredData[i]["year"];
           d.properties.lifeLadder = vis.filteredData[i]["Life Ladder"];
           d.properties.socialSupport = vis.filteredData[i]["Social support"];
@@ -186,7 +184,6 @@ class ChoroplethMap {
           d.properties.negative = vis.filteredData[i]["Negative affect"];
           d.properties.generosity = vis.filteredData[i]["Generosity"];
           d.properties.mapIsClicked = 0;
-          // }
         }
       }
     });
@@ -1040,7 +1037,6 @@ class ChoroplethMap {
         }
       })
       .attr("fill", (d) => {
-
         if (d.properties[attrName] == undefined) {
           return "black";
         } else if (vis.isClickedOnMap == false) {
