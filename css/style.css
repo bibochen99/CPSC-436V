@@ -5,9 +5,6 @@ body {
 }
 
 .container {
-  /* position: relative; */
-  /* justify-content: center; */
-  /* border: 1px solid #ddd; */
   margin: auto;
   margin-bottom: 100px;
   margin-top: 20px;
@@ -213,54 +210,16 @@ pre {
   margin-left: 20px;
 }
 
+
 .scatter-plot.selected {
   stroke: orange;
-  stroke-width: 3;
+  stroke-width: 2;
+  fill: orange;
+  opacity: 1;
 }
 
-
-/* Customizable classes used in D3 vis, uncomment to customize
-.svg-vis {
-  background-color: gray;
-  opacity: 0.5;
-}
-.verticesTooltip {
-  position: absolute;
-  color: red;
-  font-size: 12px;
-  width: 100px;
-  height: auto;
-  padding: 5px;
-  border: 2px solid gray;
-  border-radius: 5px;
-  pointer-events: none;
-  opacity: 0;
-  background: #f4f4f;
-}
-.level-lines {
-  stroke: red;
-  stroke-width: 1px;
-}
-
-.axis-lines {
-  stroke: blue;
-  stroke-width: 2px;
-}
-
-.axis-labels {
-  fill: blue;
-  font-size: 12px;
-}
-
-.polygon-vertices {
-  fill-opacity: 0.6;
-}
-.polygon-areas {
-  fill-opacity: 0.6;
-}
-*/
 .legend-tiles {
-  fill-opacity: 0.3;
+  fill-opacity: 0.4;
 }
 .legend-labels {
   font-size: 15px;

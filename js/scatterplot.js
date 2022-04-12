@@ -138,6 +138,7 @@ class Scatterplot {
       .attr('cx', d => vis.xScale(vis.xValue(d)))
       .attr('stroke', 'blue')
       .attr('fill', 'lightblue')
+      .attr('opacity',0.3)
       .classed("selected", d => {
         if (d.display == true) {
           return true;
